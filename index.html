@@ -4,19 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="appTitle">ভোলা ডেভেলপমেন্ট ফোরাম</title>
-    <!-- Favicon -->
     <link id="appFavicon" rel="icon" type="image/png" href="https://via.placeholder.com/192">
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .gallery-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1rem; }
+        @media (min-width: 640px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1280px) { .gallery-grid { grid-template-columns: repeat(4, 1fr); } }
+        .gallery-item { position: relative; overflow: hidden; border-radius: 1rem; background: #f8fafc; transition: all 0.3s ease; }
+        .gallery-item:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); }
+        .gallery-img { width: 100%; height: 220px; object-fit: cover; display: block; transition: transform 0.5s ease; }
+        .gallery-item:hover .gallery-img { transform: scale(1.05); }
+        .gallery-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%); opacity: 0; transition: opacity 0.3s; display: flex; flex-direction: column; justify-content: flex-end; padding: 1rem; }
+        .gallery-item:hover .gallery-overlay { opacity: 1; }
+        .gallery-caption { color: white; font-size: 0.85rem; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .gallery-date { color: rgba(255,255,255,0.8); font-size: 0.7rem; margin-top: 0.25rem; }
+        .gallery-delete { position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(239,68,68,0.9); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer; opacity: 0; transition: opacity 0.3s; z-index: 10; }
+        .gallery-item:hover .gallery-delete { opacity: 1; }
+        .gallery-delete:hover { background: rgb(220,38,38); transform: scale(1.1); }
+        .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 1rem; opacity: 0; transition: opacity 0.3s; }
+        .lightbox.active { display: flex; opacity: 1; }
+        .lightbox-img { max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: 0.5rem; }
+        .lightbox-close { position: absolute; top: 1rem; right: 1rem; color: white; font-size: 1.5rem; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.1); transition: background 0.2s; }
+        .lightbox-close:hover { background: rgba(255,255,255,0.2); }
+        .lightbox-caption { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); color: white; text-align: center; background: rgba(0,0,0,0.6); padding: 0.5rem 1.5rem; border-radius: 2rem; font-size: 0.875rem; max-width: 80%; }
+        .upload-zone { border: 2px dashed #cbd5e1; border-radius: 1rem; padding: 2rem; text-align: center; transition: all 0.3s; cursor: pointer; }
+        .upload-zone:hover, .upload-zone.dragover { border-color: #3b82f6; background: #eff6ff; }
+        .dark .upload-zone { border-color: #334155; }
+        .dark .upload-zone:hover, .dark .upload-zone.dragover { border-color: #60a5fa; background: #1e293b; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    </style>
 </head>
 <body id="mainBody" class="bg-slate-100 text-slate-800 transition-colors duration-300">
 
-    <!-- Header Section -->
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+        <div class="lightbox-close" onclick="closeLightboxDirect()"><i class="fa-solid fa-xmark"></i></div>
+        <img id="lightboxImg" src="" class="lightbox-img" onclick="event.stopPropagation()">
+        <div id="lightboxCaption" class="lightbox-caption"></div>
+    </div>
+
+    <!-- Header -->
     <header id="headerTheme" class="bg-blue-900 text-white shadow-xl py-5 px-4 border-b-4 border-amber-400 transition-colors duration-300">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <!-- Logo & Title -->
             <div class="flex items-center gap-4 text-center md:text-left">
                 <div class="relative group cursor-pointer" onclick="triggerLogoUpload()">
                     <img id="logoDisplay" src="https://via.placeholder.com/192" alt="Logo" class="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border-2 border-amber-400 shadow-md bg-white">
@@ -26,7 +64,6 @@
                     </div>
                 </div>
                 <input type="file" id="logoFileInput" class="hidden" accept="image/*" onchange="handleLogoUpload(event)">
-                
                 <div>
                     <h1 class="text-xl md:text-3xl font-black tracking-wide" data-translate="appName">ভোলা ডেভেলপমেন্ট ফোরাম</h1>
                     <p class="text-xs md:text-sm text-blue-100 mt-1 font-medium">
@@ -34,45 +71,33 @@
                     </p>
                 </div>
             </div>
-
-            <!-- Top Actions & Controls -->
             <div class="flex flex-wrap items-center justify-center gap-2.5">
-                <!-- Theme Selectors -->
                 <div class="flex bg-black/20 p-1 rounded-xl border border-white/10">
                     <button onclick="setTheme('blue')" title="Blue Theme" class="w-6 h-6 rounded-lg bg-blue-700 border border-white/30 hover:scale-110 transition"></button>
                     <button onclick="setTheme('teal')" title="Teal Theme" class="w-6 h-6 rounded-lg bg-teal-700 border border-white/30 hover:scale-110 transition ml-1"></button>
                     <button onclick="setTheme('purple')" title="Purple Theme" class="w-6 h-6 rounded-lg bg-purple-700 border border-white/30 hover:scale-110 transition ml-1"></button>
                 </div>
-
-                <!-- Dark Mode Toggle -->
                 <button onclick="toggleDarkMode()" class="bg-black/20 hover:bg-black/30 border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
                     <i id="modeIcon" class="fa-solid fa-moon"></i>
                     <span id="modeText">Dark Mode</span>
                 </button>
-
-                <!-- Language Toggle -->
                 <button onclick="toggleLanguage()" class="bg-amber-400 text-blue-950 px-3 py-2 rounded-xl text-xs font-bold shadow hover:bg-amber-300 transition">
                     <span id="langBtnText">বাংলা</span>
                 </button>
-
-                <!-- Admin Login/Logout -->
                 <button id="authBtn" onclick="toggleAdminMode()" class="bg-amber-400 text-blue-950 font-bold text-xs px-4 py-2 rounded-xl shadow flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-lock"></i> <span>অ্যাডমিন লগইন</span>
+                    <i class="fa-solid fa-lock"></i> <span data-translate="adminLogin">অ্যাডমিন লগইন</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Notice Bar (Moving/Marquee enabled) -->
+    <!-- Notice Bar -->
     <div id="noticeBarTheme" class="bg-blue-950 text-white shadow-md border-b border-black/20 transition-colors duration-300 py-2.5 px-4 flex items-center">
         <div class="max-w-6xl mx-auto w-full flex items-center gap-3 text-xs md:text-sm">
             <span class="bg-amber-500 text-blue-950 font-black px-2.5 py-1 rounded text-[11px] uppercase tracking-wider shrink-0 z-10 shadow" data-translate="noticeLabel">জরুরি নোটিশ:</span>
-            
-            <!-- Marquee Running Text -->
             <div class="overflow-hidden whitespace-nowrap w-full relative">
                 <marquee scrollamount="5" id="runningNoticeDisplay" class="font-medium text-amber-200">ভোলা ডেভেলপমেন্ট ফোরামের অফিশিয়াল অনলাইন পোর্টালে স্বাগতম।</marquee>
             </div>
-
             <div id="noticeEditContainer" class="hidden items-center gap-2 shrink-0 z-10">
                 <input type="text" id="noticeInputBox" placeholder="নোটিশ আপডেট করুন..." class="px-3 py-1 rounded-lg text-slate-800 text-xs w-48 sm:w-64 outline-none">
                 <button onclick="updateNoticeText()" class="bg-amber-400 text-blue-950 font-bold px-3 py-1 rounded-lg hover:bg-amber-300 text-xs shrink-0" data-translate="updateNoticeBtn">সেভ</button>
@@ -84,10 +109,10 @@
     <main class="max-w-6xl mx-auto px-4 py-6 space-y-8">
 
         <!-- Live Clock & Last Updated Bar -->
-        <div class="flex flex-col sm:flex-row justify-between items-center bg-white border border-slate-200 card-bg p-4 rounded-2xl shadow-sm text-xs md:text-sm gap-2">
+        <div class="flex flex-col sm:flex-row justify-between items-center bg-white border border-slate-200 card-bg p-4 rounded-2xl shadow-sm text-xs md:text-sm gap-2 fade-in">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-clock text-blue-600"></i>
-                <span data-translate="liveTimeLabel">লাইভ সময়:</span>
+                <span data-translate="liveTimeLabel">লাইভ সময়:</span>
                 <span id="liveClockDisplay" class="font-mono font-bold text-blue-600">--:--:--</span>
             </div>
             <div class="flex items-center gap-2 text-slate-500">
@@ -98,17 +123,17 @@
         </div>
 
         <!-- Dashboard Stat Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 fade-in">
             <div class="bg-white border border-slate-200 card-bg p-6 rounded-2xl shadow-sm border-l-4 border-emerald-500 flex items-center justify-between">
                 <div>
-                    <p class="text-xs text-slate-400 uppercase font-semibold" data-translate="totalIncomeCard">মোট আয়</p>
+                    <p class="text-xs text-slate-400 uppercase font-semibold" data-translate="totalIncomeCard">মোট আয়</p>
                     <h2 id="totalIncomeDisp" class="text-2xl md:text-3xl font-black text-emerald-600 mt-1">৳ 0</h2>
                 </div>
                 <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-arrow-down-long"></i></div>
             </div>
             <div class="bg-white border border-slate-200 card-bg p-6 rounded-2xl shadow-sm border-l-4 border-rose-500 flex items-center justify-between">
                 <div>
-                    <p class="text-xs text-slate-400 uppercase font-semibold" data-translate="totalExpenseCard">মোট ব্যয়</p>
+                    <p class="text-xs text-slate-400 uppercase font-semibold" data-translate="totalExpenseCard">মোট ব্যয়</p>
                     <h2 id="totalExpenseDisp" class="text-2xl md:text-3xl font-black text-rose-600 mt-1">৳ 0</h2>
                 </div>
                 <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-arrow-up-long"></i></div>
@@ -123,49 +148,47 @@
         </div>
 
         <!-- Admin Transaction Form Section (Hidden by Default) -->
-        <section id="transactionFormSection" class="hidden bg-white border border-slate-200 card-bg p-6 rounded-2xl shadow-sm space-y-4">
+        <section id="transactionFormSection" class="hidden bg-white border border-slate-200 card-bg p-6 rounded-2xl shadow-sm space-y-4 fade-in">
             <h3 class="font-bold text-sm md:text-base text-blue-900 dark:text-blue-400 flex items-center gap-2">
-                <i class="fa-solid fa-circle-plus"></i> <span data-translate="addNewTransTitle">নতুন আয় / ব্যয় যোগ করুন (অ্যাডমিন প্যানেল)</span>
+                <i class="fa-solid fa-circle-plus"></i> <span data-translate="addNewTransTitle">নতুন আয় / ব্যয় যোগ করুন (অ্যাডমিন প্যানেল)</span>
             </h3>
             <form id="transactionForm" onsubmit="addTransaction(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
                 <div>
                     <label class="block text-xs text-slate-400 mb-1" data-translate="dateLabel">তারিখ</label>
-                    <input type="date" id="tDate" required class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent">
+                    <input type="date" id="tDate" required class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent dark:border-slate-700">
                 </div>
                 <div>
                     <label class="block text-xs text-slate-400 mb-1" data-translate="descLabel">বিবরণ</label>
-                    <input type="text" id="tDesc" placeholder="বিবরণ লিখুন..." required class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent">
+                    <input type="text" id="tDesc" placeholder="বিবরণ লিখুন..." required class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent dark:border-slate-700">
                 </div>
                 <div>
                     <label class="block text-xs text-slate-400 mb-1" data-translate="typeLabel">ধরন</label>
-                    <select id="tType" class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent">
-                        <option value="Income" data-translate="incomeOpt">আয় (Income)</option>
-                        <option value="Expense" data-translate="expenseOpt">ব্যয় (Expense)</option>
+                    <select id="tType" class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent dark:border-slate-700">
+                        <option value="Income" data-translate="incomeOpt">আয় (Income)</option>
+                        <option value="Expense" data-translate="expenseOpt">ব্যয় (Expense)</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs text-slate-400 mb-1" data-translate="amountLabel">পরিমাণ (৳)</label>
-                    <input type="number" id="tAmount" placeholder="টাকার পরিমাণ" required class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent">
+                    <input type="number" id="tAmount" placeholder="টাকার পরিমাণ" required class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent dark:border-slate-700">
                 </div>
                 <div class="flex items-end">
                     <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs hover:bg-blue-700 shadow transition" data-translate="addBtn">যোগ করুন</button>
                 </div>
             </form>
-            
-            <!-- Admin Password Change Option -->
             <div class="pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <span class="text-xs font-semibold" data-translate="changePassLabel">পাসওয়ার্ড পরিবর্তন করুন:</span>
                 <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <input type="password" id="newPassInput" placeholder="নতুন পাসওয়ার্ড" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-transparent w-full sm:w-48">
+                    <input type="password" id="newPassInput" placeholder="নতুন পাসওয়ার্ড" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-transparent dark:border-slate-700 w-full sm:w-48">
                     <button onclick="updatePassword()" class="bg-amber-500 text-blue-950 font-bold px-4 py-1.5 rounded-xl text-xs hover:bg-amber-400 shadow shrink-0" data-translate="updatePassBtn">সেভ পাসওয়ার্ড</button>
                 </div>
             </div>
         </section>
 
         <!-- Income & Expense Ledger Table -->
-        <section class="bg-white border border-slate-200 card-bg rounded-2xl shadow-sm overflow-hidden">
+        <section class="bg-white border border-slate-200 card-bg rounded-2xl shadow-sm overflow-hidden fade-in">
             <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                <h3 class="font-bold text-sm md:text-base" data-translate="ledgerTableTitle">বিস্তারিত আয় ও ব্যয়ের হিসাব</h3>
+                <h3 class="font-bold text-sm md:text-base" data-translate="ledgerTableTitle">বিস্তারিত আয় ও ব্যয়ের হিসাব</h3>
                 <span class="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-semibold" data-translate="viewOnlyBadge">পাবলিক ভিউ</span>
             </div>
             <div class="overflow-x-auto">
@@ -175,8 +198,8 @@
                             <th class="p-3.5" data-translate="thDate">তারিখ</th>
                             <th class="p-3.5" data-translate="thDesc">বিবরণ</th>
                             <th class="p-3.5" data-translate="thType">ধরন</th>
-                            <th class="p-3.5 text-right" data-translate="thIncome">আয় (টাকা)</th>
-                            <th class="p-3.5 text-right" data-translate="thExpense">ব্যয় (টাকা)</th>
+                            <th class="p-3.5 text-right" data-translate="thIncome">আয় (টাকা)</th>
+                            <th class="p-3.5 text-right" data-translate="thExpense">ব্যয় (টাকা)</th>
                             <th id="actionHeaderTh" class="p-3.5 text-center hidden" data-translate="thAction">অ্যাকশন</th>
                         </tr>
                     </thead>
@@ -188,8 +211,7 @@
         </section>
 
         <!-- Members & Executive Committee Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Executive Committee List -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 fade-in">
             <section class="bg-white border border-slate-200 card-bg p-6 rounded-2xl shadow-sm space-y-4">
                 <div class="flex justify-between items-center">
                     <h3 class="font-bold text-sm md:text-base flex items-center gap-2">
@@ -203,8 +225,6 @@
                     <!-- Dynamic Executive List -->
                 </div>
             </section>
-
-            <!-- General Members List -->
             <section class="bg-white border border-slate-200 card-bg p-6 rounded-2xl shadow-sm space-y-4">
                 <div class="flex justify-between items-center">
                     <h3 class="font-bold text-sm md:text-base flex items-center gap-2">
@@ -220,6 +240,52 @@
             </section>
         </div>
 
+        <!-- GALLERY CORNER SECTION -->
+        <section id="gallerySection" class="bg-white border border-slate-200 card-bg p-6 rounded-2xl shadow-sm space-y-5 fade-in">
+            <div class="flex justify-between items-center flex-wrap gap-3">
+                <h3 class="font-bold text-sm md:text-base flex items-center gap-2">
+                    <i class="fa-solid fa-images text-blue-600"></i> <span data-translate="galleryTitle">কার্যক্রম ও ফটো গ্যালারি কর্নার</span>
+                </h3>
+                <span id="galleryCountBadge" class="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-semibold">0 ছবি</span>
+            </div>
+
+            <!-- Admin Upload Panel -->
+            <div id="galleryUploadPanel" class="hidden">
+                <div class="upload-zone" id="galleryUploadZone" onclick="document.getElementById('galleryFileInput').click()">
+                    <input type="file" id="galleryFileInput" class="hidden" accept="image/*" onchange="handleGalleryUpload(event)">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-300 mb-2"></i>
+                    <p class="text-sm font-medium text-slate-600" data-translate="galleryUploadText">ছবি আপলোড করতে ক্লিক করুন বা ড্র্যাগ করুন</p>
+                    <p class="text-[10px] text-slate-400 mt-1">JPEG, PNG, WEBP — সর্বোচ্চ 2MB</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs text-slate-400 mb-1" data-translate="galleryCaptionLabel">ছবির বিবরণ / ক্যাপশন</label>
+                        <input type="text" id="galleryCaptionInput" placeholder="যেমন: সভা ২০২৫, সদস্য মিলনমেলা..." class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent dark:border-slate-700 outline-none focus:border-blue-500">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="saveGalleryImage()" class="w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs hover:bg-blue-700 shadow transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i> <span data-translate="gallerySaveBtn">গ্যালারিতে সেভ করুন</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="galleryPreviewArea" class="hidden mt-4">
+                    <p class="text-xs text-slate-400 mb-2" data-translate="galleryPreviewLabel">প্রিভিউ:</p>
+                    <img id="galleryPreviewImg" src="" class="h-32 rounded-xl border border-slate-200 object-cover">
+                </div>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div id="galleryGrid" class="gallery-grid">
+                <!-- Dynamic Gallery Items -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="galleryEmpty" class="text-center py-10">
+                <i class="fa-regular fa-images text-4xl text-slate-200 mb-3"></i>
+                <p class="text-sm text-slate-400" data-translate="galleryEmptyText">এখনো কোনো ছবি যোগ করা হয়নি।</p>
+            </div>
+        </section>
+
     </main>
 
     <!-- Footer -->
@@ -227,7 +293,6 @@
         <p data-translate="footerCopyright">© 2026 ভোলা ডেভেলপমেন্ট ফোরাম | সাধারণ সম্পাদক: মোঃ জসিম উদ্দিন বাবুল</p>
     </footer>
 
-    <!-- Script Section -->
     <script>
         const translations = {
             bn: {
@@ -238,36 +303,44 @@
                 langBtnText: "English",
                 modeDark: "Dark Mode",
                 modeLight: "Light Mode",
-                liveTimeLabel: "লাইভ সময়:",
+                liveTimeLabel: "লাইভ সময়:",
                 lastUpdateLabel: "সর্বশেষ আপডেট:",
                 noticeLabel: "জরুরি নোটিশ:",
                 updateNoticeBtn: "সেভ",
                 changePassLabel: "পাসওয়ার্ড পরিবর্তন করুন:",
                 updatePassBtn: "সেভ পাসওয়ার্ড",
-                totalIncomeCard: "মোট আয়",
-                totalExpenseCard: "মোট ব্যয়",
+                totalIncomeCard: "মোট আয়",
+                totalExpenseCard: "মোট ব্যয়",
                 balanceCard: "বর্তমান স্থিতি",
-                addNewTransTitle: "নতুন আয় / ব্যয় যোগ করুন (অ্যাডমিন প্যানেল)",
+                addNewTransTitle: "নতুন আয় / ব্যয় যোগ করুন (অ্যাডমিন প্যানেল)",
                 dateLabel: "তারিখ",
                 descLabel: "বিবরণ",
                 typeLabel: "ধরন",
-                incomeOpt: "আয় (Income)",
-                expenseOpt: "ব্যয় (Expense)",
+                incomeOpt: "আয় (Income)",
+                expenseOpt: "ব্যয় (Expense)",
                 amountLabel: "পরিমাণ (৳)",
                 addBtn: "যোগ করুন",
-                ledgerTableTitle: "বিস্তারিত আয় ও ব্যয়ের হিসাব",
+                ledgerTableTitle: "বিস্তারিত আয় ও ব্যয়ের হিসাব",
                 viewOnlyBadge: "পাবলিক ভিউ",
                 thDate: "তারিখ",
                 thDesc: "বিবরণ",
                 thType: "ধরন",
-                thIncome: "আয় (টাকা)",
-                thExpense: "ব্যয় (টাকা)",
+                thIncome: "আয় (টাকা)",
+                thExpense: "ব্যয় (টাকা)",
                 thAction: "অ্যাকশন",
                 execTitle: "কার্যনির্বাহী কমিটি",
                 addPosBtn: "পদ যোগ করুন",
                 generalTitle: "সাধারণ সদস্যবৃন্দ",
                 addMemberBtn: "সদস্য যোগ করুন",
-                footerCopyright: "© 2026 ভোলা ডেভেলপমেন্ট ফোরাম | সাধারণ সম্পাদক: মোঃ জসিম উদ্দিন বাবুল"
+                footerCopyright: "© 2026 ভোলা ডেভেলপমেন্ট ফোরাম | সাধারণ সম্পাদক: মোঃ জসিম উদ্দিন বাবুল",
+                galleryTitle: "কার্যক্রম ও ফটো গ্যালারি কর্নার",
+                galleryUploadText: "ছবি আপলোড করতে ক্লিক করুন বা ড্র্যাগ করুন",
+                galleryCaptionLabel: "ছবির বিবরণ / ক্যাপশন",
+                gallerySaveBtn: "গ্যালারিতে সেভ করুন",
+                galleryPreviewLabel: "প্রিভিউ:",
+                galleryEmptyText: "এখনো কোনো ছবি যোগ করা হয়নি।",
+                galleryDeleteConfirm: "আপনি কি এই ছবিটি মুছে ফেলতে চান?",
+                galleryCount: "ছবি"
             },
             en: {
                 appName: "Bhola Development Forum",
@@ -306,7 +379,15 @@
                 addPosBtn: "Add Position",
                 generalTitle: "General Members List",
                 addMemberBtn: "Add Member",
-                footerCopyright: "© 2026 Bhola Development Forum | General Secretary: Md. Jasim Uddin Babul"
+                footerCopyright: "© 2026 Bhola Development Forum | General Secretary: Md. Jasim Uddin Babul",
+                galleryTitle: "Activities & Photo Gallery Corner",
+                galleryUploadText: "Click or drag to upload photo",
+                galleryCaptionLabel: "Photo caption / description",
+                gallerySaveBtn: "Save to Gallery",
+                galleryPreviewLabel: "Preview:",
+                galleryEmptyText: "No photos added yet.",
+                galleryDeleteConfirm: "Are you sure you want to delete this photo?",
+                galleryCount: "photos"
             }
         };
 
@@ -324,7 +405,7 @@
                 const key = el.getAttribute('data-translate');
                 if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
             });
-            renderAll();
+            renderGallery();
             updateLastUpdateDisplay();
         }
 
@@ -386,33 +467,105 @@
                 body.className = "bg-slate-950 text-slate-100 transition-colors duration-300";
                 modeIcon.className = "fa-solid fa-sun text-amber-300";
                 modeText.innerText = translations[currentLang].modeLight;
-                cards.forEach(c => { c.className = c.className.replace('bg-white border-slate-200', 'bg-slate-900 border-slate-800 text-slate-100'); });
+                cards.forEach(c => { c.classList.remove('bg-white','border-slate-200'); c.classList.add('bg-slate-900','border-slate-800','text-slate-100'); });
             } else {
                 body.className = "bg-slate-100 text-slate-800 transition-colors duration-300";
                 modeIcon.className = "fa-solid fa-moon";
                 modeText.innerText = translations[currentLang].modeDark;
-                cards.forEach(c => { c.className = c.className.replace('bg-slate-900 border-slate-800 text-slate-100', 'bg-white border-slate-200 text-slate-800'); });
+                cards.forEach(c => { c.classList.remove('bg-slate-900','border-slate-800','text-slate-100'); c.classList.add('bg-white','border-slate-200','text-slate-800'); });
             }
-            renderAll();
         }
 
-        let noticeText = localStorage.getItem('bhola_notice') || 'ভোলা ডেভেলপমেন্ট ফোরামের অফিশিয়াল অনলাইন পোর্টালে স্বাগতম।';
-        let customLogo = localStorage.getItem('bhola_logo') || 'https://via.placeholder.com/192';
-        
-        let savedExec = JSON.parse(localStorage.getItem('bhola_executives'));
-        if(!savedExec || savedExec.some(e => e.role === 'সাধারণ সম্পাদক' && e.name !== 'মোঃ জসিম উদ্দিন বাবুল')) {
-            localStorage.setItem('bhola_executives', JSON.stringify([
-                { name: 'মোঃ জসিম উদ্দিন বাবুল', role: 'সাধারণ সম্পাদক' }
-            ]));
-        }
-        let executives = JSON.parse(localStorage.getItem('bhola_executives')) || [
-            { name: 'মোঃ জসিম উদ্দিন বাবুল', role: 'সাধারণ সম্পাদক' }
+        // Data Management & LocalStorage
+        let transactions = JSON.parse(localStorage.getItem('bhola_transactions')) || [
+            { id: 1, date: '2026-01-10', desc: 'প্রতিষ্ঠাকালীন অনুদান ও চাঁদা', type: 'Income', amount: 50000 },
+            { id: 2, date: '2026-02-05', desc: 'অফিস ব্যানার ও প্যাড প্রিন্টিং', type: 'Expense', amount: 3500 }
         ];
-        let transactions = JSON.parse(localStorage.getItem('bhola_transactions')) || [];
-        let generals = JSON.parse(localStorage.getItem('bhola_generals')) || [];
 
+        let executiveMembers = JSON.parse(localStorage.getItem('bhola_exec')) || [
+            { id: 1, position: 'সাধারণ সম্পাদক', name: 'মোঃ জসিম উদ্দিন বাবুল' }
+        ];
+
+        let generalMembers = JSON.parse(localStorage.getItem('bhola_gen')) || [
+            { id: 1, name: 'সদস্যবৃন্দ' }
+        ];
+
+        let galleryImages = JSON.parse(localStorage.getItem('bhola_gallery')) || [];
+        let tempGalleryImgData = "";
+
+        // Notice Board
+        let runningNotice = localStorage.getItem('bhola_notice') || "ভোলা ডেভেলপমেন্ট ফোরামের অফিশিয়াল অনলাইন পোর্টালে স্বাগতম।";
+        document.getElementById('runningNoticeDisplay').innerText = runningNotice;
+        document.getElementById('noticeInputBox').value = runningNotice;
+
+        function updateNoticeText() {
+            const val = document.getElementById('noticeInputBox').value.trim();
+            if(val) {
+                runningNotice = val;
+                localStorage.setItem('bhola_notice', val);
+                document.getElementById('runningNoticeDisplay').innerText = val;
+                lastUpdateTime = new Date().toISOString();
+                localStorage.setItem('bhola_last_update', lastUpdateTime);
+                updateLastUpdateDisplay();
+                alert('নোটিশ সফলভাবে আপডেট করা হয়েছে!');
+            }
+        }
+
+        // Admin Auth
+        function toggleAdminMode() {
+            if(!isAdmin) {
+                let pass = prompt(currentLang === 'bn' ? "অ্যাডমিন পাসওয়ার্ড লিখুন:" : "Enter Admin Password:");
+                if(pass === adminPass) {
+                    isAdmin = true;
+                    document.getElementById('authBtn').innerHTML = `<i class="fa-solid fa-lock-open"></i> <span data-translate="adminLogout">${translations[currentLang].adminLogout}</span>`;
+                    document.getElementById('transactionFormSection').classList.remove('hidden');
+                    document.getElementById('actionHeaderTh').classList.remove('hidden');
+                    document.getElementById('noticeEditContainer').classList.remove('hidden');
+                    document.getElementById('noticeEditContainer').classList.add('flex');
+                    document.getElementById('addExecBtn').classList.remove('hidden');
+                    document.getElementById('addGenBtn').classList.remove('hidden');
+                    document.getElementById('galleryUploadPanel').classList.remove('hidden');
+                    renderLedger();
+                    renderExecutive();
+                    renderGeneral();
+                    renderGallery();
+                } else if(pass !== null) {
+                    alert(currentLang === 'bn' ? "ভুল পাসওয়ার্ড!" : "Incorrect Password!");
+                }
+            } else {
+                isAdmin = false;
+                document.getElementById('authBtn').innerHTML = `<i class="fa-solid fa-lock"></i> <span data-translate="adminLogin">${translations[currentLang].adminLogin}</span>`;
+                document.getElementById('transactionFormSection').classList.add('hidden');
+                document.getElementById('actionHeaderTh').classList.add('hidden');
+                document.getElementById('noticeEditContainer').classList.remove('flex');
+                document.getElementById('noticeEditContainer').classList.add('hidden');
+                document.getElementById('addExecBtn').classList.add('hidden');
+                document.getElementById('addGenBtn').classList.add('hidden');
+                document.getElementById('galleryUploadPanel').classList.add('hidden');
+                renderLedger();
+                renderExecutive();
+                renderGeneral();
+                renderGallery();
+            }
+        }
+
+        function updatePassword() {
+            const newPass = document.getElementById('newPassInput').value.trim();
+            if(newPass) {
+                adminPass = newPass;
+                localStorage.setItem('bhola_admin_pass', newPass);
+                document.getElementById('newPassInput').value = '';
+                alert(currentLang === 'bn' ? "অ্যাডমিন পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!" : "Admin password updated successfully!");
+            } else {
+                alert(currentLang === 'bn' ? "সঠিক নতুন পাসওয়ার্ড দিন।" : "Please enter a valid password.");
+            }
+        }
+
+        // Logo Handling
         function triggerLogoUpload() {
-            if(isAdmin) document.getElementById('logoFileInput').click();
+            if(isAdmin) {
+                document.getElementById('logoFileInput').click();
+            }
         }
 
         function handleLogoUpload(event) {
@@ -420,208 +573,256 @@
             if(file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    customLogo = e.target.result;
-                    localStorage.setItem('bhola_logo', customLogo);
-                    saveData();
-                    alert(currentLang === 'bn' ? 'লোগো সফলভাবে আপডেট করা হয়েছে!' : 'Logo updated successfully!');
+                    const base64 = e.target.result;
+                    document.getElementById('logoDisplay').src = base64;
+                    localStorage.setItem('bhola_logo', base64);
+                    lastUpdateTime = new Date().toISOString();
+                    localStorage.setItem('bhola_last_update', lastUpdateTime);
+                    updateLastUpdateDisplay();
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function toggleAdminMode() {
-            if(!isAdmin) {
-                let pass = prompt(currentLang === 'bn' ? "গোপন পাসওয়ার্ডটি দিন:" : "Enter admin password:");
-                if(pass === adminPass) {
-                    isAdmin = true;
-                    alert(currentLang === 'bn' ? "অ্যাডমিন মোড সফলভাবে সক্রিয় হয়েছে।" : "Admin mode activated.");
-                } else {
-                    alert(currentLang === 'bn' ? "ভুল পাসওয়ার্ড!" : "Wrong password!");
-                    return;
-                }
-            } else {
-                isAdmin = false;
-                alert(currentLang === 'bn' ? "লগআউট করা হয়েছে।" : "Logged out.");
-            }
-            renderAll();
+        const savedLogo = localStorage.getItem('bhola_logo');
+        if(savedLogo) {
+            document.getElementById('logoDisplay').src = savedLogo;
         }
 
-        function updatePassword() {
-            if(!isAdmin) return;
-            const newPass = document.getElementById('newPassInput').value.trim();
-            if(newPass) {
-                adminPass = newPass;
-                localStorage.setItem('bhola_admin_pass', newPass);
-                document.getElementById('newPassInput').value = '';
-                saveData();
-                alert(currentLang === 'bn' ? 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!' : 'Password updated successfully!');
-            } else {
-                alert(currentLang === 'bn' ? 'অনুগ্রহ করে নতুন পাসওয়ার্ড লিখুন।' : 'Please enter a new password.');
-            }
-        }
+        // Transactions
+        function addTransaction(e) {
+            e.preventDefault();
+            const date = document.getElementById('tDate').value;
+            const desc = document.getElementById('tDesc').value;
+            const type = document.getElementById('tType').value;
+            const amount = parseFloat(document.getElementById('tAmount').value);
 
-        function saveData() {
+            const newT = { id: Date.now(), date, desc, type, amount };
+            transactions.push(newT);
+            localStorage.setItem('bhola_transactions', JSON.stringify(transactions));
+
             lastUpdateTime = new Date().toISOString();
             localStorage.setItem('bhola_last_update', lastUpdateTime);
-            localStorage.setItem('bhola_notice', noticeText);
-            localStorage.setItem('bhola_transactions', JSON.stringify(transactions));
-            localStorage.setItem('bhola_executives', JSON.stringify(executives));
-            localStorage.setItem('bhola_generals', JSON.stringify(generals));
-            renderAll();
+
+            document.getElementById('transactionForm').reset();
+            renderLedger();
             updateLastUpdateDisplay();
         }
 
-        function updateNoticeText() {
-            if(!isAdmin) return;
-            const val = document.getElementById('noticeInputBox').value.trim();
-            if(val) { noticeText = val; saveData(); alert('Notice updated!'); }
-        }
-
-        function addTransaction(e) {
-            e.preventDefault();
-            if(!isAdmin) return;
-            transactions.unshift({
-                date: document.getElementById('tDate').value,
-                desc: document.getElementById('tDesc').value,
-                type: document.getElementById('tType').value,
-                amount: Number(document.getElementById('tAmount').value)
-            });
-            saveData();
-            document.getElementById('transactionForm').reset();
-        }
-
-        function deleteTransaction(i) {
-            if(isAdmin && confirm('Delete?')) { transactions.splice(i, 1); saveData(); }
-        }
-
-        function addExecutiveMember() {
-            if(!isAdmin) return;
-            let name = prompt(currentLang === 'bn' ? "সদস্যের নাম লিখুন:" : "Enter name:");
-            let role = prompt(currentLang === 'bn' ? "পদের নাম লিখুন (যেমন: সভাপতি, কোষাধ্যক্ষ):" : "Enter role:");
-            if(name && role) { 
-                executives.push({name, role}); 
-                saveData(); 
+        function deleteTransaction(id) {
+            if(confirm(currentLang === 'bn' ? "আপনি কি এই হিসাবটি মুছে ফেলতে চান?" : "Are you sure you want to delete this record?")) {
+                transactions = transactions.filter(t => t.id !== id);
+                localStorage.setItem('bhola_transactions', JSON.stringify(transactions));
+                lastUpdateTime = new Date().toISOString();
+                localStorage.setItem('bhola_last_update', lastUpdateTime);
+                renderLedger();
+                updateLastUpdateDisplay();
             }
         }
 
-        function deleteExecutiveMember(i) {
-            if(isAdmin && confirm(currentLang === 'bn' ? 'আপনি কি এই পদটি বাদ দিতে চান?' : 'Do you want to delete this position?')) { 
-                executives.splice(i, 1); 
-                saveData(); 
-            }
-        }
+        function renderLedger() {
+            const tbody = document.getElementById('ledgerTableBody');
+            tbody.innerHTML = '';
+            let totalInc = 0, totalExp = 0;
 
-        function addGeneralMember() {
-            if(!isAdmin) return;
-            let name = prompt(currentLang === 'bn' ? "সদস্যের নাম লিখুন:" : "Enter name:");
-            let phone = prompt(currentLang === 'bn' ? "মোবাইল নম্বর লিখুন:" : "Enter phone:");
-            if(name && phone) { 
-                generals.push({name, phone}); 
-                saveData(); 
-            }
-        }
-
-        function deleteGeneralMember(i) {
-            if(isAdmin && confirm(currentLang === 'bn' ? 'আপনি কি এই সদস্যকে বাদ দিতে চান?' : 'Do you want to delete this general member?')) { 
-                generals.splice(i, 1); 
-                saveData(); 
-            }
-        }
-
-        function renderAll() {
-            document.getElementById('runningNoticeDisplay').innerText = noticeText;
-            document.getElementById('noticeInputBox').value = noticeText;
-
-            document.getElementById('logoDisplay').src = customLogo;
-            document.getElementById('appFavicon').href = customLogo;
-
-            const authBtn = document.getElementById('authBtn');
-            const noticeEditContainer = document.getElementById('noticeEditContainer');
-            const transactionFormSection = document.getElementById('transactionFormSection');
-            const actionHeaderTh = document.getElementById('actionHeaderTh');
-            const addExecBtn = document.getElementById('addExecBtn');
-            const addGenBtn = document.getElementById('addGenBtn');
-            const logoActionsOverlay = document.getElementById('logoActionsOverlay');
-
-            if(isAdmin) {
-                authBtn.innerHTML = `<i class="fa-solid fa-lock-open"></i> <span>লগআউট</span>`;
-                authBtn.className = "bg-rose-600 text-white font-bold text-xs px-4 py-2 rounded-xl shadow";
-                noticeEditContainer.classList.remove('hidden');
-                noticeEditContainer.classList.add('flex');
-                transactionFormSection.classList.remove('hidden');
-                actionHeaderTh.classList.remove('hidden');
-                addExecBtn.classList.remove('hidden');
-                addGenBtn.classList.remove('hidden');
-                logoActionsOverlay.classList.remove('hidden');
-            } else {
-                authBtn.innerHTML = `<i class="fa-solid fa-lock"></i> <span>অ্যাডমিন লগইন</span>`;
-                authBtn.className = "bg-amber-400 text-blue-950 font-bold text-xs px-4 py-2 rounded-xl shadow";
-                noticeEditContainer.classList.add('hidden');
-                noticeEditContainer.classList.remove('flex');
-                transactionFormSection.classList.add('hidden');
-                actionHeaderTh.classList.add('hidden');
-                addExecBtn.classList.add('hidden');
-                addGenBtn.classList.add('hidden');
-                logoActionsOverlay.classList.add('hidden');
+            if(transactions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">কোনো হিসাব পাওয়া যায়নি।</td></tr>`;
             }
 
-            let totalInc = 0, totalExp = 0, tableBody = document.getElementById('ledgerTableBody');
-            tableBody.innerHTML = '';
-            transactions.forEach((t, i) => {
-                if(t.type === 'Income') totalInc += t.amount; else totalExp += t.amount;
-                tableBody.innerHTML += `
-                    <tr class="hover:bg-black/5 transition">
-                        <td class="p-3">${t.date}</td>
-                        <td class="p-3">${t.desc}</td>
-                        <td class="p-3"><span class="px-2 py-0.5 rounded text-xs ${t.type==='Income'?'bg-emerald-100 text-emerald-800':'bg-rose-100 text-rose-800'}">${t.type}</span></td>
-                        <td class="p-3 text-right font-bold text-emerald-600">${t.type==='Income'?'৳ '+t.amount.toLocaleString():'-'}</td>
-                        <td class="p-3 text-right font-bold text-rose-600">${t.type==='Expense'?'৳ '+t.amount.toLocaleString():'-'}</td>
-                        ${isAdmin?`<td class="p-3 text-center"><button onclick="deleteTransaction(${i})" class="text-rose-500 hover:scale-110 transition"><i class="fa-solid fa-trash"></i></button></td>`:''}
-                    </tr>`;
+            transactions.forEach(t => {
+                if(t.type === 'Income') totalInc += t.amount;
+                else totalExp += t.amount;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-900/40 transition";
+                tr.innerHTML = `
+                    <td class="p-3.5 whitespace-nowrap">${t.date}</td>
+                    <td class="p-3.5 font-medium">${t.desc}</td>
+                    <td class="p-3.5 whitespace-nowrap"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${t.type === 'Income' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">${t.type === 'Income' ? (currentLang==='bn'?'আয়':'Income') : (currentLang==='bn'?'ব্যয়':'Expense')}</span></td>
+                    <td class="p-3.5 text-right font-bold text-emerald-600">${t.type === 'Income' ? '৳ ' + t.amount.toLocaleString() : '-'}</td>
+                    <td class="p-3.5 text-right font-bold text-rose-600">${t.type === 'Expense' ? '৳ ' + t.amount.toLocaleString() : '-'}</td>
+                    <td class="p-3.5 text-center ${isAdmin ? '' : 'hidden'}">
+                        <button onclick="deleteTransaction(${t.id})" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
             });
 
             document.getElementById('totalIncomeDisp').innerText = '৳ ' + totalInc.toLocaleString();
             document.getElementById('totalExpenseDisp').innerText = '৳ ' + totalExp.toLocaleString();
-            document.getElementById('netBalanceDisp').innerText = '৳ ' + (totalInc - totalExp).toLocaleString();
+            const net = totalInc - totalExp;
+            const netDisp = document.getElementById('netBalanceDisp');
+            netDisp.innerText = '৳ ' + net.toLocaleString();
+            netDisp.className = `text-2xl md:text-3xl font-black mt-1 ${net >= 0 ? 'text-blue-600' : 'text-rose-600'}`;
+        }
 
-            let execList = document.getElementById('executiveList');
-            execList.innerHTML = '';
-            if(executives.length === 0) {
-                execList.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">কোনো পদ যুক্ত করা হয়নি।</p>`;
-            } else {
-                executives.forEach((e, i) => {
-                    execList.innerHTML += `
-                        <div class="flex justify-between items-center p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                            <div>
-                                <span class="font-bold text-sm block">${e.name}</span>
-                                <span class="text-xs text-blue-600 font-semibold">${e.role}</span>
-                            </div>
-                            ${isAdmin ? `<button onclick="deleteExecutiveMember(${i})" class="text-rose-500 hover:text-rose-700 text-xs px-2 py-1"><i class="fa-solid fa-trash"></i></button>` : ''}
-                        </div>`;
-                });
-            }
-
-            let genList = document.getElementById('generalList');
-            genList.innerHTML = ``;
-            if(generals.length === 0) {
-                genList.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">কোনো সাধারণ সদস্য যুক্ত করা হয়নি।</p>`;
-            } else {
-                generals.forEach((g, i) => {
-                    genList.innerHTML += `
-                        <div class="flex justify-between items-center p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                            <div>
-                                <span class="font-medium text-sm block">${g.name}</span>
-                                <span class="text-xs text-slate-500 font-mono">${g.phone}</span>
-                            </div>
-                            ${isAdmin ? `<button onclick="deleteGeneralMember(${i})" class="text-rose-500 hover:text-rose-700 text-xs px-2 py-1"><i class="fa-solid fa-trash"></i></button>` : ''}
-                        </div>`;
-                });
+        // Executive Committee
+        function addExecutiveMember() {
+            let pos = prompt(currentLang==='bn'?'পদবির নাম দিন:':'Enter position name:');
+            let name = prompt(currentLang==='bn'?'সদস্যের নাম দিন:':'Enter member name:');
+            if(pos && name) {
+                executiveMembers.push({ id: Date.now(), position: pos, name: name });
+                localStorage.setItem('bhola_exec', JSON.stringify(executiveMembers));
+                lastUpdateTime = new Date().toISOString();
+                localStorage.setItem('bhola_last_update', lastUpdateTime);
+                renderExecutive();
+                updateLastUpdateDisplay();
             }
         }
 
-        applyLanguage();
+        function deleteExecutive(id) {
+            executiveMembers = executiveMembers.filter(m => m.id !== id);
+            localStorage.setItem('bhola_exec', JSON.stringify(executiveMembers));
+            renderExecutive();
+        }
+
+        function renderExecutive() {
+            const list = document.getElementById('executiveList');
+            list.innerHTML = '';
+            executiveMembers.forEach(m => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-xs md:text-sm";
+                div.innerHTML = `
+                    <div>
+                        <span class="font-bold text-blue-600">${m.position}:</span> <span class="font-medium">${m.name}</span>
+                    </div>
+                    ${isAdmin ? `<button onclick="deleteExecutive(${m.id})" class="text-rose-500 hover:text-rose-700"><i class="fa-solid fa-xmark"></i></button>` : ''}
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // General Members
+        function addGeneralMember() {
+            let name = prompt(currentLang==='bn'?'সাধারণ সদস্যের নাম দিন:':'Enter general member name:');
+            if(name) {
+                generalMembers.push({ id: Date.now(), name: name });
+                localStorage.setItem('bhola_gen', JSON.stringify(generalMembers));
+                renderGeneral();
+            }
+        }
+
+        function deleteGeneral(id) {
+            generalMembers = generalMembers.filter(m => m.id !== id);
+            localStorage.setItem('bhola_gen', JSON.stringify(generalMembers));
+            renderGeneral();
+        }
+
+        function renderGeneral() {
+            const list = document.getElementById('generalList');
+            list.innerHTML = '';
+            generalMembers.forEach(m => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-xs md:text-sm";
+                div.innerHTML = `
+                    <span class="font-medium"><i class="fa-solid fa-user text-slate-400 mr-2"></i>${m.name}</span>
+                    ${isAdmin ? `<button onclick="deleteGeneral(${m.id})" class="text-rose-500 hover:text-rose-700"><i class="fa-solid fa-xmark"></i></button>` : ''}
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // Gallery Management
+        function handleGalleryUpload(event) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    tempGalleryImgData = e.target.result;
+                    document.getElementById('galleryPreviewImg').src = tempGalleryImgData;
+                    document.getElementById('galleryPreviewArea').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveGalleryImage() {
+            const caption = document.getElementById('galleryCaptionInput').value.trim();
+            if(!tempGalleryImgData) {
+                alert(currentLang === 'bn' ? "দয়া করে একটি ছবি নির্বাচন করুন।" : "Please select an image first.");
+                return;
+            }
+            const newImg = {
+                id: Date.now(),
+                img: tempGalleryImgData,
+                caption: caption || (currentLang === 'bn' ? 'কার্যক্রম' : 'Activity'),
+                date: new Date().toLocaleDateString(currentLang === 'bn' ? 'bn-BD' : 'en-US')
+            };
+            galleryImages.unshift(newImg);
+            localStorage.setItem('bhola_gallery', JSON.stringify(galleryImages));
+
+            lastUpdateTime = new Date().toISOString();
+            localStorage.setItem('bhola_last_update', lastUpdateTime);
+
+            tempGalleryImgData = "";
+            document.getElementById('galleryCaptionInput').value = '';
+            document.getElementById('galleryPreviewImg').src = '';
+            document.getElementById('galleryPreviewArea').classList.add('hidden');
+            document.getElementById('galleryFileInput').value = '';
+
+            renderGallery();
+            updateLastUpdateDisplay();
+        }
+
+        function deleteGalleryImage(id) {
+            if(confirm(translations[currentLang].galleryDeleteConfirm)) {
+                galleryImages = galleryImages.filter(img => img.id !== id);
+                localStorage.setItem('bhola_gallery', JSON.stringify(galleryImages));
+                renderGallery();
+            }
+        }
+
+        function openLightbox(imgSrc, captionText) {
+            document.getElementById('lightboxImg').src = imgSrc;
+            document.getElementById('lightboxCaption').innerText = captionText;
+            document.getElementById('lightbox').classList.add('active');
+        }
+
+        function closeLightbox(e) {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+
+        function closeLightboxDirect() {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+
+        function renderGallery() {
+            const grid = document.getElementById('galleryGrid');
+            const emptyState = document.getElementById('galleryEmpty');
+            const countBadge = document.getElementById('galleryCountBadge');
+            
+            grid.innerHTML = '';
+            countBadge.innerText = `${galleryImages.length} ${translations[currentLang].galleryCount}`;
+
+            if(galleryImages.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            galleryImages.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "gallery-item shadow-sm";
+                div.innerHTML = `
+                    ${isAdmin ? `<div class="gallery-delete" onclick="deleteGalleryImage(${item.id})" title="Delete"><i class="fa-solid fa-trash-can"></i></div>` : ''}
+                    <img src="${item.img}" alt="${item.caption}" class="gallery-img cursor-pointer" onclick="openLightbox('${item.img}', '${item.caption}')">
+                    <div class="gallery-overlay pointer-events-none">
+                        <p class="gallery-caption">${item.caption}</p>
+                        <p class="gallery-date"><i class="fa-regular fa-calendar mr-1"></i>${item.date}</p>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        // Initial Calls
         applyModeAndTheme();
-        updateLastUpdateDisplay();
+        applyLanguage();
+        renderLedger();
+        renderExecutive();
+        renderGeneral();
+        renderGallery();
     </script>
 </body>
 </html>
