@@ -28,6 +28,88 @@
         .dark .border-slate-200 { border-color: #334155; }
         .dark .bg-slate-50, .dark .bg-slate-100 { background-color: #0f172a; }
         .dark input, .dark textarea, .dark select { background-color: #334155; border-color: #475569; color: white; }
+
+        /* Custom Login Modal Styles */
+        #custom-login-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .login-box {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            width: 360px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border-top: 4px solid #059669;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        @keyframes modalSlideIn {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .login-box .logo-circle {
+            width: 60px; height: 60px; background: #ecfdf5; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;
+            border: 2px solid #059669;
+        }
+        .login-box h3 {
+            margin-bottom: 5px;
+            color: #064e3b;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .login-box .subtitle {
+            font-size: 12px;
+            margin-bottom: 18px;
+            color: #059669;
+            font-weight: 600;
+        }
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 18px;
+            border: 2px solid #d1fae5;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 18px;
+            letter-spacing: 4px;
+            outline: none;
+            transition: all 0.3s;
+            color: #064e3b;
+            font-weight: bold;
+        }
+        .login-box input:focus {
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
+        }
+        .login-box button {
+            padding: 10px 24px;
+            background: #059669;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .login-box button:hover { background: #047857; transform: translateY(-1px); }
+        .login-box button.cancel {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .login-box button.cancel:hover { background: #fecaca; }
+        .dark .login-box { background: #1e293b; }
+        .dark .login-box h3 { color: #34d399; }
+        .dark .login-box input { background: #334155; border-color: #475569; color: #fff; }
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -67,11 +149,11 @@
                 </div>
                 <input type="file" id="logoFileInput" class="hidden" accept="image/*" onchange="handleLogoUpload(event)">
                 <div class="flex-grow">
-                    <h1 class="text-xl md:text-2xl font-bold tracking-wide">ভোলা ডেভেলপমেন্ট ফোরাম (BDF)</h1>
+                    <h1 id="headerTitle" class="text-xl md:text-2xl font-bold tracking-wide">ভোলা ডেভেলপমেন্ট ফোরাম (BDF)</h1>
                     <p class="text-xs text-amber-300 font-semibold tracking-wider mt-0.5">Save, Serve, Develop</p>
                     <div id="logoSaveAction" class="hidden mt-2">
                         <button onclick="saveLogoToFirebase()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> <span data-en="Save Logo to Cloud" data-bn="ক্লাউডে লোগো সেভ করুন">কলাউডে লোগো সেভ করুন</span>
+                            <i class="fa-solid fa-cloud-arrow-up"></i> <span data-en="Save Logo to Cloud" data-bn="ক্লাউডে লোগো সেভ করুন">ক্লাউডে লোগো সেভ করুন</span>
                         </button>
                     </div>
                 </div>
@@ -126,6 +208,7 @@
                 <button onclick="switchTab('committee', this)" class="nav-tab px-3 py-2 rounded-lg hover:bg-emerald-900 transition flex items-center gap-1.5 whitespace-nowrap text-white/80"><i class="fa-solid fa-users"></i> <span data-en="Committee" data-bn="কমিটি">কমিটি</span></button>
                 <button onclick="switchTab('finance', this)" class="nav-tab px-3 py-2 rounded-lg hover:bg-emerald-900 transition flex items-center gap-1.5 whitespace-nowrap text-white/80"><i class="fa-solid fa-wallet"></i> <span data-en="Finance & Accounts" data-bn="হিসাব ও ব্যবস্থাপনা">হিসাব ও ব্যবস্থাপনা</span> <i class="fa-solid fa-lock text-[10px] text-amber-400"></i></button>
                 <button onclick="switchTab('gallery', this)" class="nav-tab px-3 py-2 rounded-lg hover:bg-emerald-900 transition flex items-center gap-1.5 whitespace-nowrap text-white/80"><i class="fa-solid fa-images"></i> <span data-en="Gallery" data-bn="গ্যালারি">গ্যালারি</span></button>
+                <button id="editorTabBtn" onclick="switchTab('content-editor', this)" class="nav-tab px-3 py-2 rounded-lg hover:bg-emerald-900 transition flex items-center gap-1.5 whitespace-nowrap text-white/80 hidden"><i class="fa-solid fa-pen-to-square text-amber-400"></i> <span data-en="Editor" data-bn="এডিটর">এডিটর</span></button>
             </div>
         </div>
     </nav>
@@ -135,12 +218,12 @@
                 <h2 class="text-lg md:text-xl font-bold text-emerald-900 flex items-center gap-2 border-b pb-3"><i class="fa-solid fa-bullseye text-amber-500"></i> <span data-en="Forum Goals & Activities" data-bn="ফোরামের লক্ষ্য ও কার্যক্রম">ফোরামের লক্ষ্য ও কার্যক্রম</span></h2>
                 <div class="bg-emerald-50 border-l-4 border-emerald-600 p-5 rounded-xl">
                     <h4 class="font-bold text-emerald-900 text-base mb-2" data-en="Our Commitment:" data-bn="আমাদের প্রত্যয়:">আমাদের প্রত্যয়:</h4>
-                    <p class="text-slate-700 text-sm md:text-base leading-relaxed" data-en="A united platform of job holders, businessmen and professionals from Bhola district living in Chittagong, Dhaka and other places, aimed at overall development and public welfare of Bhola district." data-bn="চট্টগ্রাম, ঢাকা ও দেশের অন্যান্য স্থানে কর্মরত ভোলা জেলার চাকরিজীবী, ব্যবসায়ী ও বিভিন্ন পেশাজীবী ভাইদের নিয়ে গঠিত একটি ঐক্যবদ্ধ প্ল্যাটফর্ম—যার মূল লক্ষ্য ভোলা জেলার সামগ্রিক উন্নয়ন ও জনকল্যাণ নিশ্চিত করা।">চট্টগ্রাম, ঢাকা ও দেের অন্যান্য স্থানে কর্মরত ভোলা জেলার চাকরিজীবী, ব্যবসায়ী ও বিভিন্ন পেশাজীবী ভাইদের নিয়ে গঠিত একটি ঐক্যবদ্ধ প্ল্যাটফর্ম—যার মূল লক্ষ্য ভোলা জেলার সামগ্রিক উন্নয়ন ও জনকল্যাণ নিশ্চিত করা।</p>
+                    <p id="homeIntroText" class="text-slate-700 text-sm md:text-base leading-relaxed" data-en="A united platform of job holders, businessmen and professionals from Bhola district living in Chittagong, Dhaka and other places, aimed at overall development and public welfare of Bhola district." data-bn="চট্টগ্রাম, ঢাকা ও দেশের অন্যান্য স্থানে কর্মরত ভোলা জেলার চাকরিজীবী, ব্যবসায়ী ও বিভিন্ন পেশাজীবী ভাইদের নিয়ে গঠিত একটি ঐক্যবদ্ধ প্ল্যাটফর্ম—যার মূল লক্ষ্য ভোলা জেলার সামগ্রিক উন্নয়ন ও জনকল্যাণ নিশ্চিত করা।">চট্টগ্রাম, ঢাকা ও দেশের অন্যান্য স্থানে কর্মরত ভোলা জেলার চাকরিজীবী, ব্যবসায়ী ও বিভিন্ন পেশাজীবী ভাইদের নিয়ে গঠিত একটি ঐক্যবদ্ধ প্ল্যাটফর্ম—যার মূল লক্ষ্য ভোলা জেলার সামগ্রিক উন্নয়ন ও জনকল্যাণ নিশ্চিত করা।</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
                     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center hover:shadow-md transition">
                         <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl"><i class="fa-solid fa-hand-holding-heart"></i></div>
-                        <h3 class="font-bold text-emerald-900 text-sm" data-en="Public Welfare" data-bn="জনকল্াণ">জনকল্যাণ</h3>
+                        <h3 class="font-bold text-emerald-900 text-sm" data-en="Public Welfare" data-bn="জনকল্যাণ">জনকল্যাণ</h3>
                         <p class="text-xs text-slate-500 mt-1" data-en="Continuous effort for social development." data-bn="সামাজিক উন্নয়নে নিরলস প্রচেষ্টা।">সামাজিক উন্নয়নে নিরলস প্রচেষ্টা।</p>
                     </div>
                     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center hover:shadow-md transition">
@@ -164,7 +247,7 @@
                 </div>
                 <div id="introDisplayView" class="space-y-3">
                     <div id="displayIntroText" class="text-sm md:text-base text-slate-700 leading-relaxed">ভোলা ডেভেলপমেন্ট ফোরাম (BDF) একটি অরাজনৈতিক সেবামূলক সংগঠন।</div>
-                    <span class="text-xs text-slate-500 block mt-2" id="introLastUpdate">সর্বশেষ আপডেট: অদ্য</span>
+                    <span class="text-xs text-slate-500 block mt-2" id="introLastUpdate">সর্বশষ আপডেট: অদ্য</span>
                 </div>
                 <div id="introEditView" class="hidden space-y-3">
                     <textarea id="inputIntroText" class="w-full p-4 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition bg-white" rows="6"></textarea>
@@ -220,7 +303,7 @@
                     </div>
                     <div class="bg-emerald-50 p-5 rounded-xl border border-emerald-100 shadow-sm">
                         <span class="text-xs text-emerald-700 font-bold uppercase tracking-wider" data-en="Remaining Balance" data-bn="অবশিষ্ট স্থিতি">অবশিষ্ট স্থিতি</span>
-                        <h3 id="financeBalance" class="font-bold text-2xl text-emerald-600 mt-3">৳ ০</h3>
+                        <h3 id="financeBalance" class="font-bold text-2xl text-emerald-600 mt-3"> ০</h3>
                     </div>
                 </div>
                 <div class="space-y-4 pt-4 border-t border-slate-200">
@@ -247,6 +330,52 @@
                 <div id="galleryEmpty" class="text-center py-12 text-slate-400 text-sm flex flex-col items-center"><i class="fa-regular fa-images text-4xl mb-2 opacity-50"></i><span data-en="No photos available." data-bn="কোনো ছবি নেই।">কোনো ছবি নেই।</span></div>
             </div>
         </section>
+        <section id="tab-content-editor" class="tab-content hidden space-y-6 fade-in">
+            <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-5">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <h3 class="font-bold text-sm md:text-base flex items-center gap-2 text-emerald-900">
+                        <i class="fa-solid fa-pen-to-square text-emerald-600"></i> 
+                        <span data-en="Home & Content Editor Form" data-bn="হোম ও কন্টেন্ট এডিট ফরম">হোম ও কন্টেন্ট এডিট ফরম</span>
+                    </h3>
+                    <span class="text-xs text-slate-500" data-en="Admin Control Panel" data-bn="অ্যাডমিন কন্ট্রোল প্যানেল">অ্যাডমিন কন্ট্রোল প্যানেল</span>
+                </div>
+                <form id="contentEditForm" onsubmit="handleContentEditSubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1" data-en="Portal Main Title" data-bn="পোর্টালের মূল শিরোনাম">পোর্টালের মূল শিরোনাম</label>
+                        <input type="text" id="editPortalTitle" class="w-full p-2.5 text-xs border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white transition" placeholder="যেমন: ভোলা ডেভেলপমেন্ট ফোরাম (BDF)">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1" data-en="Marquee Notice / Announcement" data-bn="চলমান নোটিশ / ঘোষণা">চলমান নোটিশ / ঘোষণা</label>
+                        <textarea id="editNoticeText" rows="2" class="w-full p-2.5 text-xs border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white transition" placeholder="নোটিশ লিখুন..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1" data-en="Home / About Description" data-bn="হোম / পরিচিতির বিবরণ">হোম / পরিচিতির বিবরণ</label>
+                        <textarea id="editAboutText" rows="4" class="w-full p-2.5 text-xs border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white transition" placeholder="সংগঠন বা পোর্টালে বিস্তারিত বিবরণ লিখুন..."></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1" data-en="Upload New Logo" data-bn="নতুন লোগো আপলোড করুন">নতুন লোগো আপলোড করুন</label>
+                            <input type="file" id="formLogoInput" accept="image/*" onchange="handleFormLogoPreview(event)" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 transition cursor-pointer">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1" data-en="Current Logo Preview" data-bn="বর্তমান লোগো প্রিভিউ">বর্তমান লোগো প্রিভিউ</label>
+                            <img id="formLogoPreview" src="https://via.placeholder.com/192?text=BDF" class="w-10 h-10 rounded-full object-cover border border-slate-300 bg-white">
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-3 pt-4 border-t">
+                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-floppy-disk"></i> <span data-en="Save Changes" data-bn="পরিবর্তনগুলো সেভ করুন">পরিবর্তনগুলো সেভ করুন</span>
+                        </button>
+                        <button type="button" onclick="downloadPortalDataJSON()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-download"></i> <span data-en="Download Data Backup" data-bn="ডাটা ব্যাকআপ ডাউনলোড করুন">ডাটা ব্যাকআপ ডাউনলোড করুন</span>
+                        </button>
+                        <button type="button" onclick="downloadPortalHTML()" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-code"></i> <span data-en="Download Full HTML" data-bn="সম্পূর্ণ HTML ডাউনলোড করুন">সম্পূর্ণ HTML ডাউনলোড করুন</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
     </main>
     <footer class="bg-emerald-900 text-white py-8 text-center text-sm border-t-4 border-amber-400 mt-auto font-medium transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4">
@@ -254,12 +383,26 @@
             <p class="text-xs text-emerald-300">Save, Serve, Develop</p>
         </div>
     </footer>
+    <!-- Custom Login Modal -->
+    <div id="custom-login-modal">
+        <div class="login-box">
+            <div class="logo-circle"><i class="fa-solid fa-lock text-emerald-600 text-xl"></i></div>
+            <h3>ভোলা ডেভেলপমেন্ট ফোরাম</h3>
+            <p class="subtitle">Save, Serve, Develop</p>
+            <p style="font-size: 13px; margin-bottom: 12px; color: #555;" data-en="Enter Admin PIN:" data-bn="অ্যাডমিন পিন নম্বর দিন:">অ্যাডমিন পিন নম্বর দিন:</p>
+            <input type="password" id="admin-pin-input" placeholder="••••" onkeydown="if(event.key==='Enter')verifyPin()">
+            <div>
+                <button onclick="verifyPin()" data-en="Login" data-bn="লগইন">লগইন</button>
+                <button class="cancel" onclick="closeCustomLogin()" data-en="Cancel" data-bn="বাতিল">বাতিল</button>
+            </div>
+        </div>
+    </div>
     <div id="printableVoucherSection" class="hidden fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden">
             <div id="printableVoucher" class="bg-white p-8 space-y-5">
                 <div class="text-center border-b-2 border-emerald-900 pb-4">
                     <img id="vouchLogo" src="" class="w-12 h-12 mx-auto mb-2 rounded-full object-cover border border-gray-200">
-                    <h3 class="font-bold text-xl text-emerald-900">ভোলা ডেভেলপমেন্ট ফোরাম (BDF)</h3>
+                    <h3 id="vouchOrgTitle" class="font-bold text-xl text-emerald-900">ভোলা ডেভেলপমেন্ট ফোরাম (BDF)</h3>
                     <p class="text-xs text-slate-600" data-en="Official Payment/Receipt Voucher" data-bn="অফিশিয়াল পেমেন্ট/রিসিট ভাউচার">অফিশিয়াল পেমেন্ট/রিসিট ভাউচার</p>
                 </div>
                 <div class="grid grid-cols-2 text-sm gap-4">
@@ -275,7 +418,7 @@
             </div>
             <div class="bg-slate-50 p-4 flex justify-end gap-2 border-t no-print">
                 <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-5 py-2 rounded-lg shadow transition font-bold"><i class="fa-solid fa-print mr-1"></i> <span data-en="Print" data-bn="প্রিন্ট করুন">প্রিন্ট করুন</span></button>
-                <button onclick="document.getElementById('printableVoucherSection').classList.add('hidden')" class="bg-slate-300 hover:bg-slate-400 text-slate-800 text-xs px-4 py-2 rounded-lg font-bold transition" data-en="Close" data-bn="বন্ধ করুন">বন্ধ করুন</button>
+                <button onclick="document.getElementById('printableVoucherSection').classList.add('hidden')" class="bg-slate-300 hover:bg-slate-400 text-slate-800 text-xs px-4 py-2 rounded-lg font-bold transition" data-en="Close" data-bn="বন্ধ করুন">বন্ধ করন</button>
             </div>
         </div>
     </div>
@@ -285,6 +428,8 @@
         let currentLang = localStorage.getItem('bdf_lang') || 'bn';
         let tempLogoData = "";
         let adminPin = "2026";
+        let formLogoData = "";
+        let pinCallback = null;
         window.galleryImages = [];
         window.portalIntroData = { text: "ভোলা ডেভেলপমেন্ট ফোরাম (BDF) একটি অরাজনৈতিক সেবামূলক সংগঠন।", date: "অদ্য" };
         window.committeeData = [{ name: "ড. মো. রফিকুল ইসলাম", role: "সভাপতি", phone: "01700000000", photo: "https://via.placeholder.com/150", date: "২০২৬" }];
@@ -304,6 +449,23 @@
             }
             applyLanguage();
         });
+
+        // Custom Login Modal Functions
+        function customPrompt(callback, title, subtitle) {
+            document.getElementById('custom-login-modal').style.display = 'flex';
+            document.getElementById('admin-pin-input').value = '';
+            document.getElementById('admin-pin-input').focus();
+            pinCallback = callback;
+        }
+        function verifyPin() {
+            let enteredPin = document.getElementById('admin-pin-input').value;
+            document.getElementById('custom-login-modal').style.display = 'none';
+            if (pinCallback) pinCallback(enteredPin);
+        }
+        function closeCustomLogin() {
+            document.getElementById('custom-login-modal').style.display = 'none';
+            if (pinCallback) pinCallback(null);
+        }
 
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('fade-in'); });
@@ -347,23 +509,25 @@
 
         async function toggleAdminMode() {
             if(!isAdmin) {
-                let pass = prompt(currentLang === 'bn' ? `অ্যাডমিন পিন নম্বর দিন:` : `Enter Admin PIN:`);
-                if(pass === adminPin) activateAdmin();
-                else if(pass !== null) showToast(currentLang === 'bn' ? "ভুল পিন নম্বর!" : "Wrong PIN!", 'error');
+                customPrompt((pass) => {
+                    if(pass === adminPin) activateAdmin();
+                    else if(pass !== null) showToast(currentLang === 'bn' ? "ভুল পিন নম্বর!" : "Wrong PIN!", 'error');
+                });
             } else deactivateAdmin();
         }
         function activateAdmin() {
             isAdmin = true;
-            document.getElementById('authBtn').innerHTML = `<i class="fa-solid fa-lock-open"></i> <span data-en="Logout" data-bn="লগআউট">লগআউট</span>`;
+            document.getElementById('authBtn').innerHTML = `<i class="fa-solid fa-lock-open"></i> <span data-en="Logout" data-bn="গআউট">লগআউট</span>`;
             document.getElementById('editIntroBtn').classList.remove('hidden');
             document.getElementById('adminNoticeEditBtn').classList.remove('hidden');
             document.getElementById('committeeAdminAction').classList.remove('hidden');
             document.getElementById('committeeAddBtnContainer').classList.remove('hidden');
             document.getElementById('adminThemeControls').classList.remove('hidden');
+            document.getElementById('editorTabBtn').classList.remove('hidden');
             if(tempLogoData) document.getElementById('logoSaveAction').classList.remove('hidden');
             document.getElementById('financeLockScreen').classList.add('hidden');
             document.getElementById('financeContentScreen').classList.remove('hidden');
-            renderCommittee(); renderFinance();
+            renderCommittee(); renderFinance(); loadEditorForm();
             showToast(currentLang === 'bn' ? "অ্যাডমিন মোড সক্রিয় হয়েছে!" : "Admin mode activated!");
         }
         function deactivateAdmin() {
@@ -374,6 +538,7 @@
             document.getElementById('committeeAdminAction').classList.add('hidden');
             document.getElementById('committeeAddBtnContainer').classList.add('hidden');
             document.getElementById('adminThemeControls').classList.add('hidden');
+            document.getElementById('editorTabBtn').classList.add('hidden');
             document.getElementById('logoSaveAction').classList.add('hidden');
             document.getElementById('financeContentScreen').classList.add('hidden');
             document.getElementById('financeLockScreen').classList.remove('hidden');
@@ -381,18 +546,20 @@
         }
         async function changeAdminPasswordPrompt() {
             if(!isAdmin) return;
-            let newPin = prompt(currentLang === 'bn' ? "নতুন অ্যাডমিন পিন সেট করুন (৪ ডিজিট):" : "Set new Admin PIN (4 digits):");
-            if(newPin && newPin.length >= 4) {
-                const { doc, setDoc } = window.FirestoreLib;
-                await setDoc(doc(window.db, "portal_settings", "security"), { adminPin: newPin });
-                adminPin = newPin;
-                showToast(currentLang === 'bn' ? "অ্যাডমিন পিন সফলভাবে পরিবর্তিত হয়েছে!" : "Admin PIN changed successfully!");
-            } else if(newPin) showToast(currentLang === 'bn' ? "পিন নম্বর খুব ছোট!" : "PIN is too short!", 'error');
+            customPrompt((newPin) => {
+                if(newPin && newPin.length >= 4) {
+                    const { doc, setDoc } = window.FirestoreLib;
+                    setDoc(doc(window.db, "portal_settings", "security"), { adminPin: newPin }).then(() => {
+                        adminPin = newPin;
+                        showToast(currentLang === 'bn' ? "অ্যাডমিন পিন সফলভাবে পরিবর্তিত হয়েছে!" : "Admin PIN changed successfully!");
+                    });
+                } else if(newPin) showToast(currentLang === 'bn' ? "পিন নম্বর খুব ছোট!" : "PIN is too short!", 'error');
+            });
         }
         function verifyFinanceAccess() {
             const pass = document.getElementById('financePasswordInput').value;
             if(pass === adminPin) { document.getElementById('financeLockScreen').classList.add('hidden'); document.getElementById('financeContentScreen').classList.remove('hidden'); renderFinance(); }
-            else showToast(currentLang === 'bn' ? "ভুল পিন নম্বর!" : "Wrong PIN!", 'error');
+            else showToast(currentLang === 'bn' ? "ভুল পিন ন্বর!" : "Wrong PIN!", 'error');
         }
 
         function applyCustomColors() {
@@ -406,7 +573,7 @@
         async function saveThemeColorsToFirebase() {
             const { doc, setDoc } = window.FirestoreLib;
             await setDoc(doc(window.db, "portal_content", "bdf_theme"), window.customColors);
-            showToast(currentLang === 'bn' ? "থিম কালার েভ হয়েছে!" : "Theme colors saved!");
+            showToast(currentLang === 'bn' ? "থিম কালার সেভ হয়েছে!" : "Theme colors saved!");
         }
         function triggerLogoUpload() { if(isAdmin) document.getElementById('logoFileInput').click(); }
         function handleLogoUpload(e) {
@@ -472,9 +639,10 @@
             showToast(currentLang === 'bn' ? "কমিটির তথ্য সেভ হয়েছে!" : "Committee data saved!");
         }
         function secureCall(phoneNum) {
-            let pass = prompt(currentLang === 'bn' ? "কল করতে পিন নম্বর দিন:" : "Enter PIN to call:");
-            if(pass === adminPin) window.location.href = `tel:${phoneNum}`;
-            else if(pass !== null) showToast(currentLang === 'bn' ? "ভুল পিন! কল করার অনুমতি নেই।" : "Wrong PIN! Call not authorized.", 'error');
+            customPrompt((pass) => {
+                if(pass === adminPin) window.location.href = `tel:${phoneNum}`;
+                else if(pass !== null) showToast(currentLang === 'bn' ? "ভুল পিন! কল করার অনুমতি নেই।" : "Wrong PIN! Call not authorized.", 'error');
+            });
         }
         function renderFinance() {
             document.getElementById('financeTotalFund').value = window.financeData.fund || 0;
@@ -486,7 +654,7 @@
             calculateBalance();
         }
         function createExpenseRowHTML(index, item = {}) {
-            return `<div class="expense-row p-3 bg-slate-50 border border-slate-200 rounded-lg flex gap-2 items-center fade-in"><span class="text-xs font-bold text-slate-400 w-6">#${index+1}</span><input type="date" value="${item.date || new Date().toISOString().split('T')[0]}" class="fin-date p-2 text-xs border border-slate-300 rounded w-32 outline-none focus:border-emerald-500 bg-white"><input type="text" value="${item.title || ''}" placeholder="খাত / বিবরণ" class="fin-title flex-1 p-2 text-xs border border-slate-300 rounded outline-none focus:border-emerald-500 bg-white"><input type="number" value="${item.amount || ''}" placeholder="টাকার পরিমাণ" oninput="calculateBalance()" class="fin-amount p-2 text-xs border border-slate-300 rounded w-28 outline-none focus:border-emerald-500 bg-white"><button onclick="printVoucherFromRow(this)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded shadow transition" title="ভাউচার"><i class="fa-solid fa-receipt"></i></button><button onclick="this.closest('.expense-row').remove(); calculateBalance();" class="text-rose-500 hover:text-rose-700 p-2 transition" title="মুছুন"><i class="fa-solid fa-trash"></i></button></div>`;
+            return `<div class="expense-row p-3 bg-slate-50 border border-slate-200 rounded-lg flex gap-2 items-center fade-in"><span class="text-xs font-bold text-slate-400 w-6">#${index+1}</span><input type="date" value="${item.date || new Date().toISOString().split('T')[0]}" class="fin-date p-2 text-xs border border-slate-300 rounded w-32 outline-none focus:border-emerald-500 bg-white"><input type="text" value="${item.title || ''}" placeholder="খাত / বিবরণ" class="fin-title flex-1 p-2 text-xs border border-slate-300 rounded outline-none focus:border-emerald-500 bg-white"><input type="number" value="${item.amount || ''}" placeholder="টাকার পরিমণ" oninput="calculateBalance()" class="fin-amount p-2 text-xs border border-slate-300 rounded w-28 outline-none focus:border-emerald-500 bg-white"><button onclick="printVoucherFromRow(this)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded shadow transition" title="ভাউচার"><i class="fa-solid fa-receipt"></i></button><button onclick="this.closest('.expense-row').remove(); calculateBalance();" class="text-rose-500 hover:text-rose-700 p-2 transition" title="মুছুন"><i class="fa-solid fa-trash"></i></button></div>`;
         }
         function addExpenseRow() {
             const container = document.getElementById('expenseRowsContainer');
@@ -515,6 +683,7 @@
             document.getElementById('vouchDate').innerText = date; document.getElementById('vouchTitle').innerText = title;
             document.getElementById('vouchAmount').innerText = parseFloat(amount).toLocaleString('bn-BD');
             document.getElementById('vouchLogo').src = document.getElementById('logoDisplay').src;
+            document.getElementById('vouchOrgTitle').innerText = document.getElementById('headerTitle').innerText;
             document.getElementById('printableVoucherSection').classList.remove('hidden');
         }
         async function saveFinanceData() {
@@ -530,9 +699,10 @@
             showToast(currentLang === 'bn' ? "হিসাব সেভ হয়েছে!" : "Finance saved!");
         }
         function promptGalleryUpload() {
-            let pass = prompt(currentLang === 'bn' ? "ছবি আপলোড করার জন্য পিন নম্বর দিন:" : "Enter PIN to upload photo:");
-            if(pass === adminPin || pass === "bdf2026") document.getElementById('galleryFileInput').click();
-            else if(pass !== null) showToast(currentLang === 'bn' ? "ভুল পিন নম্বর!" : "Wrong PIN!", 'error');
+            customPrompt((pass) => {
+                if(pass === adminPin || pass === "bdf2026") document.getElementById('galleryFileInput').click();
+                else if(pass !== null) showToast(currentLang === 'bn' ? "ভুল পিন নম্বর!" : "Wrong PIN!", 'error');
+            });
         }
         async function handleGalleryFileSelect(e) {
             const file = e.target.files[0]; if(!file) return;
@@ -561,7 +731,7 @@
             });
         }
         async function deleteGalleryImage(docId, storagePath) {
-            if(!confirm(currentLang === 'bn' ? 'আপনি কি নিশ্চিভাবে এই ছবি মুছতে চান?' : 'Are you sure to delete this image?')) return;
+            if(!confirm(currentLang === 'bn' ? 'আপনি কি নিশ্চিতভাবে এই ছবি মুছতে চান?' : 'Are you sure to delete this image?')) return;
             const { deleteDoc, doc } = window.FirestoreLib; await deleteDoc(doc(window.db, "bdf_gallery", docId));
             if(storagePath) { const { deleteObject, ref } = window.StorageLib; try { await deleteObject(ref(window.storage, storagePath)); } catch(e){} }
             showToast(currentLang === 'bn' ? "ছবি মুছে ফেলা হয়েছে।" : "Image deleted.");
@@ -575,13 +745,81 @@
             document.getElementById('introLastUpdate').innerText = (currentLang === 'bn' ? 'সর্বশেষ আপডেট: ' : 'Last Update: ') + date;
             cancelIntroEdit(); showToast(currentLang === 'bn' ? "পরিচিতি সেভ হয়েছে!" : "About saved!");
         }
+
+        // Content Editor & Backup Functions
+        function loadEditorForm() {
+            document.getElementById('editPortalTitle').value = document.getElementById('headerTitle').innerText;
+            document.getElementById('editNoticeText').value = window.portalNotice;
+            document.getElementById('editAboutText').value = window.portalIntroData.text || '';
+            document.getElementById('formLogoPreview').src = document.getElementById('logoDisplay').src;
+        }
+        function handleFormLogoPreview(e) {
+            const file = e.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) { formLogoData = evt.target.result; document.getElementById('formLogoPreview').src = formLogoData; };
+            reader.readAsDataURL(file);
+        }
+        async function handleContentEditSubmit(e) {
+            e.preventDefault();
+            if(!isAdmin) { showToast(currentLang === 'bn' ? "এডিট করতে আগে অ্যাডমিন লগইন করুন।" : "Please login as admin first.", 'error'); return; }
+            const newTitle = document.getElementById('editPortalTitle').value;
+            const newNotice = document.getElementById('editNoticeText').value;
+            const newAbout = document.getElementById('editAboutText').value;
+            document.getElementById('headerTitle').innerText = newTitle;
+            window.portalNotice = newNotice;
+            window.portalIntroData.text = newAbout;
+            document.getElementById('marqueeNoticeText').innerText = newNotice;
+            document.getElementById('homeIntroText').innerText = newAbout;
+            document.getElementById('displayIntroText').innerText = newAbout;
+            const { doc, setDoc } = window.FirestoreLib;
+            await setDoc(doc(window.db, "portal_content", "bdf_notice"), { text: newNotice, date: new Date().toLocaleDateString('bn-BD') });
+            await setDoc(doc(window.db, "portal_content", "bdf_intro"), { text: newAbout, date: new Date().toLocaleDateString('bn-BD') });
+            if(formLogoData) {
+                const response = await fetch(formLogoData); const blob = await response.blob();
+                const { ref, uploadBytesResumable, getDownloadURL } = window.StorageLib;
+                const storageRef = ref(window.storage, 'portal/logo.png');
+                const uploadTask = uploadBytesResumable(storageRef, blob);
+                uploadTask.on('state_changed', () => {}, () => {}, async () => {
+                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                    await setDoc(doc(window.db, "portal_content", "bdf_logo"), { img: downloadURL });
+                    document.getElementById('logoDisplay').src = downloadURL;
+                    formLogoData = "";
+                });
+            }
+            showToast(currentLang === 'bn' ? "হোম কন্টেন্ট সফলভাবে আপডেট হয়েছে!" : "Home content updated successfully!");
+        }
+        function downloadPortalDataJSON() {
+            const portalBackup = { notice: window.portalNotice, intro: window.portalIntroData, committee: window.committeeData, finance: window.financeData, gallery: window.galleryImages, exportDate: new Date().toISOString() };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(portalBackup, null, 4));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `bdf_portal_backup_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast(currentLang === 'bn' ? "পোর্টাল ডেটার ব্যাকআপ ডাউনলোড সফল হয়েছে!" : "Portal backup downloaded successfully!");
+        }
+        function downloadPortalHTML() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", url);
+            downloadAnchor.setAttribute("download", `bdf_portal_snapshot_${Date.now()}.html`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            URL.revokeObjectURL(url);
+            showToast(currentLang === 'bn' ? "সম্পূর্ণ HTML ডাউনলোড সফল হয়েছে!" : "Full HTML downloaded successfully!");
+        }
+
         document.addEventListener('firebase-ready', () => {
             const { doc, collection, onSnapshot, query, orderBy } = window.FirestoreLib; const db = window.db;
             onSnapshot(doc(db, "portal_settings", "security"), snap => { if(snap.exists() && snap.data().adminPin) adminPin = snap.data().adminPin; });
             onSnapshot(doc(db, "portal_content", "bdf_notice"), snap => { if(snap.exists() && snap.data().text) { window.portalNotice = snap.data().text; document.getElementById('marqueeNoticeText').innerText = window.portalNotice; } });
-            onSnapshot(doc(db, "portal_content", "bdf_logo"), snap => { if(snap.exists() && snap.data().img) document.getElementById('logoDisplay').src = snap.data().img; });
+            onSnapshot(doc(db, "portal_content", "bdf_logo"), snap => { if(snap.exists() && snap.data().img) { document.getElementById('logoDisplay').src = snap.data().img; document.getElementById('formLogoPreview').src = snap.data().img; } });
             onSnapshot(doc(db, "portal_content", "bdf_theme"), snap => { if(snap.exists()) { const th = snap.data(); if(th.header) { document.getElementById('headerColorPicker').value = th.header; document.getElementById('headerTheme').style.backgroundColor = th.header; document.querySelector('meta[name="theme-color"]').setAttribute('content', th.header); } if(th.nav) { document.getElementById('navColorPicker').value = th.nav; document.getElementById('navBarTheme').style.backgroundColor = th.nav; } } });
-            onSnapshot(doc(db, "portal_content", "bdf_intro"), snap => { if(snap.exists()) { window.portalIntroData = snap.data(); document.getElementById('displayIntroText').innerText = window.portalIntroData.text || ''; document.getElementById('introLastUpdate').innerText = (currentLang === 'bn' ? 'সর্বশেষ আপডেট: ' : 'Last Update: ') + (window.portalIntroData.date || 'অদ্য'); } });
+            onSnapshot(doc(db, "portal_content", "bdf_intro"), snap => { if(snap.exists()) { window.portalIntroData = snap.data(); document.getElementById('displayIntroText').innerText = window.portalIntroData.text || ''; document.getElementById('homeIntroText').innerText = window.portalIntroData.text || ''; document.getElementById('introLastUpdate').innerText = (currentLang === 'bn' ? 'সর্বশেষ আপডেট: ' : 'Last Update: ') + (window.portalIntroData.date || 'অদ্য'); } });
             onSnapshot(doc(db, "portal_content", "bdf_committee"), snap => { if(snap.exists()) { window.committeeData = snap.data().members || []; renderCommittee(); } });
             onSnapshot(doc(db, "portal_content", "bdf_finance"), snap => { if(snap.exists()) { window.financeData = snap.data(); renderFinance(); } });
             const q = query(collection(db, "bdf_gallery"), orderBy("date", "desc"));
