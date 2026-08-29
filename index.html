@@ -33,7 +33,14 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif; }
+        
+        /* Kalpurush & SolaimanLipi Fallback for crystal clear Bengali rendering */
+        body { 
+            font-family: 'Kalpurush', 'SolaimanLipi', 'Nikosh', 'Hind Siliguri', Arial, sans-serif; 
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .gallery-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1rem; }
@@ -51,8 +58,8 @@
         .gallery-item:hover .gallery-img { transform: scale(1.05); }
         .gallery-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%); opacity: 0; transition: opacity 0.3s; display: flex; flex-direction: column; justify-content: flex-end; padding: 1rem; }
         .gallery-item:hover .gallery-overlay { opacity: 1; }
-        .gallery-caption { color: white; font-size: 0.85rem; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
-        .gallery-date { color: rgba(255,255,255,0.8); font-size: 0.7rem; margin-top: 0.25rem; }
+        .gallery-caption { color: white; font-size: 0.9rem; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .gallery-date { color: rgba(255,255,255,0.8); font-size: 0.75rem; margin-top: 0.25rem; }
         .gallery-delete { position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(239,68,68,0.9); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer; opacity: 0; transition: opacity 0.3s; z-index: 10; }
         .gallery-item:hover .gallery-delete { opacity: 1; }
         .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 1rem; opacity: 0; transition: opacity 0.3s; }
@@ -66,7 +73,7 @@
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
     </style>
 </head>
-<body id="mainBody" class="bg-slate-100 text-slate-800 transition-colors duration-300">
+<body id="mainBody" class="bg-slate-100 text-slate-900 transition-colors duration-300">
 
     <!-- Lightbox -->
     <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
@@ -81,14 +88,14 @@
             <div class="flex items-center gap-4 text-center md:text-left">
                 <div class="relative group cursor-pointer" onclick="triggerLogoUpload()">
                     <img id="logoDisplay" src="https://via.placeholder.com/192" alt="Logo" class="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border-2 border-amber-400 shadow-md bg-white">
-                    <div id="logoActionsOverlay" class="absolute inset-0 bg-black/60 rounded-2xl flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition text-[10px] text-white">
+                    <div id="logoActionsOverlay" class="absolute inset-0 bg-black/60 rounded-2xl flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition text-[11px] text-white font-medium">
                         <i class="fa-solid fa-camera mb-0.5"></i>
                         <span>পরিবর্তন</span>
                     </div>
                 </div>
                 <input type="file" id="logoFileInput" class="hidden" accept="image/*" onchange="handleLogoUpload(event)">
                 <div>
-                    <h1 class="text-xl md:text-3xl font-black tracking-wide" data-translate="appName">ভোলা ডেভেলপমেন্ট ফোরাম</h1>
+                    <h1 class="text-xl md:text-3xl font-bold tracking-wide" data-translate="appName">ভোলা ডেভেলপমেন্ট ফোরাম</h1>
                     <p class="text-xs md:text-sm text-blue-100 mt-1 font-medium">
                         <span data-translate="genSecLabel">সাধারণ সম্পাদক</span>: <span class="text-amber-300 font-bold">মোঃ জসিম উদ্দিন বাবুল</span>
                     </p>
@@ -120,12 +127,12 @@
     <!-- Notice Bar -->
     <div id="noticeBarTheme" class="bg-blue-950 text-white shadow-md border-b border-black/20 transition-colors duration-300 py-2.5 px-4 flex items-center">
         <div class="max-w-6xl mx-auto w-full flex items-center gap-3 text-xs md:text-sm">
-            <span class="bg-amber-500 text-blue-950 font-black px-2.5 py-1 rounded text-[11px] uppercase tracking-wider shrink-0 z-10 shadow" data-translate="noticeLabel">জরুরি নোটিশ:</span>
+            <span class="bg-amber-500 text-blue-950 font-bold px-2.5 py-1 rounded text-[11px] uppercase tracking-wider shrink-0 z-10 shadow" data-translate="noticeLabel">জরুরি নোটিশ:</span>
             <div class="overflow-hidden whitespace-nowrap w-full relative">
                 <marquee scrollamount="5" id="runningNoticeDisplay" class="font-medium text-amber-200">ভোলা ডেভেলপমেন্ট ফোরামের অফিশিয়াল অনলাইন পোর্টালে স্বাগতম।</marquee>
             </div>
             <div id="noticeEditContainer" class="hidden items-center gap-2 shrink-0 z-10">
-                <input type="text" id="noticeInputBox" placeholder="নোটিশ আপডেট করুন..." class="px-3 py-1 rounded-lg text-slate-800 text-xs w-48 sm:w-64 outline-none">
+                <input type="text" id="noticeInputBox" placeholder="নোটিশ আপডেট করুন..." class="px-3 py-1 rounded-lg text-slate-900 text-xs w-48 sm:w-64 outline-none font-medium">
                 <button onclick="updateNoticeText()" class="bg-amber-400 text-blue-950 font-bold px-3 py-1 rounded-lg hover:bg-amber-300 text-xs shrink-0" data-translate="updateNoticeBtn">সেভ</button>
             </div>
         </div>
@@ -154,7 +161,7 @@
                 <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center font-bold"><i class="fa-solid fa-key"></i></div>
                 <div>
                     <h4 class="font-bold text-sm" data-translate="adminSettingsTitle">অ্যাডমিন পাসওয়ার্ড পরিবর্তন</h4>
-                    <p class="text-xs text-slate-400" data-translate="adminSettingsSub">প্যানেল সুরক্ষার জন্য পাসওয়ার্ড পরিবর্তন করুন</p>
+                    <p class="text-xs text-slate-500" data-translate="adminSettingsSub">প্যানেল সুরক্ষার জন্য পাসওয়ার্ড পরিবর্তন করুন</p>
                 </div>
             </div>
             <div class="flex items-center gap-2 w-full sm:w-auto">
@@ -167,21 +174,21 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 fade-in">
             <div class="bg-white border border-slate-200 dynamic-card p-6 rounded-2xl shadow-sm border-l-4 border-emerald-500 flex items-center justify-between">
                 <div>
-                    <p class="text-xs text-slate-400 uppercase font-semibold" data-translate="totalIncomeCard">মোট আয়</p>
+                    <p class="text-xs text-slate-500 uppercase font-semibold" data-translate="totalIncomeCard">মোট আয়</p>
                     <h2 id="totalIncomeDisp" class="text-2xl md:text-3xl font-black text-emerald-600 mt-1">৳ 0</h2>
                 </div>
                 <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-arrow-down-long"></i></div>
             </div>
             <div class="bg-white border border-slate-200 dynamic-card p-6 rounded-2xl shadow-sm border-l-4 border-rose-500 flex items-center justify-between">
                 <div>
-                    <p class="text-xs text-slate-400 uppercase font-semibold" data-translate="totalExpenseCard">মোট ব্যয়</p>
+                    <p class="text-xs text-slate-500 uppercase font-semibold" data-translate="totalExpenseCard">মোট ব্যয়</p>
                     <h2 id="totalExpenseDisp" class="text-2xl md:text-3xl font-black text-rose-600 mt-1">৳ 0</h2>
                 </div>
                 <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-arrow-up-long"></i></div>
             </div>
             <div class="bg-white border border-slate-200 dynamic-card p-6 rounded-2xl shadow-sm border-l-4 border-blue-500 flex items-center justify-between">
                 <div>
-                    <p class="text-xs text-slate-400 uppercase font-semibold" data-translate="balanceCard">বর্তমান স্থিতি</p>
+                    <p class="text-xs text-slate-500 uppercase font-semibold" data-translate="balanceCard">বর্তমান স্থিতি</p>
                     <h2 id="netBalanceDisp" class="text-2xl md:text-3xl font-black text-blue-600 mt-1">৳ 0</h2>
                 </div>
                 <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-wallet"></i></div>
@@ -202,15 +209,15 @@
                 <h4 class="font-bold text-xs text-blue-600" data-translate="addCommitteeTitle">নতুন সদস্য যোগ করুন</h4>
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">সদস্যের ছবি</label>
+                        <label class="block text-xs text-slate-500 mb-1">সদস্যের ছবি</label>
                         <input type="file" id="memberImgInput" accept="image/*" class="w-full text-xs p-1.5 border border-slate-200 rounded-xl bg-white dark:bg-slate-900" onchange="handleMemberImgUpload(event)">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">নাম</label>
+                        <label class="block text-xs text-slate-500 mb-1">নাম</label>
                         <input type="text" id="memberNameInput" placeholder="সদস্যের নাম..." class="w-full p-2 rounded-xl border border-slate-200 text-xs bg-white dark:bg-slate-900 outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">পদবি</label>
+                        <label class="block text-xs text-slate-500 mb-1">পদবি</label>
                         <input type="text" id="memberRoleInput" placeholder="যেমন: সহ-সভাপতি..." class="w-full p-2 rounded-xl border border-slate-200 text-xs bg-white dark:bg-slate-900 outline-none">
                     </div>
                     <div class="flex items-end">
@@ -221,9 +228,9 @@
 
             <!-- Committee Grid -->
             <div id="committeeGrid" class="committee-grid"></div>
-            <div id="committeeEmpty" class="text-center py-8">
-                <i class="fa-regular fa-user-circle text-4xl text-slate-200 mb-2"></i>
-                <p class="text-sm text-slate-400" data-translate="committeeEmptyText">এখনো কোনো সদস্যের তালিকা যোগ করা হয়নি।</p>
+            <div id="committeeEmpty" class="hidden text-center py-8">
+                <i class="fa-regular fa-user-circle text-4xl text-slate-300 mb-2"></i>
+                <p class="text-sm text-slate-500" data-translate="committeeEmptyText">এখনো কোনো সদস্যের তালিকা যোগ করা হয়নি।</p>
             </div>
         </section>
 
@@ -234,23 +241,23 @@
             </h3>
             <form id="transactionForm" onsubmit="addTransaction(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1" data-translate="dateLabel">তারিখ</label>
-                    <input type="date" id="tDate" required class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent">
+                    <label class="block text-xs text-slate-500 mb-1" data-translate="dateLabel">তারিখ</label>
+                    <input type="date" id="tDate" required class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent font-medium">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1" data-translate="descLabel">বিবরণ</label>
-                    <input type="text" id="tDesc" placeholder="বিবরণ লিখুন..." required class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent">
+                    <label class="block text-xs text-slate-500 mb-1" data-translate="descLabel">বিবরণ</label>
+                    <input type="text" id="tDesc" placeholder="বিবরণ লিখুন..." required class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent font-medium">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1" data-translate="typeLabel">ধরন</label>
-                    <select id="tType" class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent">
+                    <label class="block text-xs text-slate-500 mb-1" data-translate="typeLabel">ধরন</label>
+                    <select id="tType" class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent font-medium">
                         <option value="Income" data-translate="incomeOpt">আয় (Income)</option>
                         <option value="Expense" data-translate="expenseOpt">ব্যয় (Expense)</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1" data-translate="amountLabel">পরিমাণ (৳)</label>
-                    <input type="number" id="tAmount" placeholder="টাকার পরিমাণ" required class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent">
+                    <label class="block text-xs text-slate-500 mb-1" data-translate="amountLabel">পরিমাণ (৳)</label>
+                    <input type="number" id="tAmount" placeholder="টাকার পরিমাণ" required class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent font-medium">
                 </div>
                 <div class="flex items-end">
                     <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs hover:bg-blue-700 shadow transition" data-translate="addBtn">যোগ করুন</button>
@@ -267,7 +274,7 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs md:text-sm">
                     <thead>
-                        <tr class="bg-slate-50 dark:bg-slate-800 text-slate-400 uppercase text-[11px] font-semibold border-b border-slate-200 dynamic-border">
+                        <tr class="bg-slate-50 dark:bg-slate-800 text-slate-500 uppercase text-[11px] font-semibold border-b border-slate-200 dynamic-border">
                             <th class="p-3.5" data-translate="thDate">তারিখ</th>
                             <th class="p-3.5" data-translate="thDesc">বিবরণ</th>
                             <th class="p-3.5" data-translate="thType">ধরন</th>
@@ -301,8 +308,8 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
                     <div class="sm:col-span-2">
-                        <label class="block text-xs text-slate-400 mb-1" data-translate="galleryCaptionLabel">ছবির বিবরণ / ক্যাপশন</label>
-                        <input type="text" id="galleryCaptionInput" placeholder="যেমন: সভা ২০২৫..." class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent outline-none">
+                        <label class="block text-xs text-slate-500 mb-1" data-translate="galleryCaptionLabel">ছবির বিবরণ / ক্যাপশন</label>
+                        <input type="text" id="galleryCaptionInput" placeholder="যেমন: সভা ২০২৫..." class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent outline-none font-medium">
                     </div>
                     <div class="flex items-end">
                         <button onclick="saveGalleryImage()" class="w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs hover:bg-blue-700 shadow transition flex items-center justify-center gap-2">
@@ -318,15 +325,15 @@
             <!-- Gallery Grid -->
             <div id="galleryGrid" class="gallery-grid"></div>
             <div id="galleryEmpty" class="text-center py-10">
-                <i class="fa-regular fa-images text-4xl text-slate-200 mb-3"></i>
-                <p class="text-sm text-slate-400" data-translate="galleryEmptyText">এখনো কোনো ছবি যোগ করা হয়নি।</p>
+                <i class="fa-regular fa-images text-4xl text-slate-300 mb-3"></i>
+                <p class="text-sm text-slate-500" data-translate="galleryEmptyText">এখনো কোনো ছবি যোগ করা হয়নি।</p>
             </div>
         </section>
 
     </main>
 
     <!-- Footer -->
-    <footer id="footerTheme" class="bg-blue-900 text-white py-6 text-center text-sm border-t-4 border-amber-400 mt-12 transition-colors duration-300">
+    <footer id="footerTheme" class="bg-blue-900 text-white py-6 text-center text-sm border-t-4 border-amber-400 mt-12 transition-colors duration-300 font-medium">
         <p data-translate="footerCopyright">© 2026 ভোলা ডেভেলপমেন্ট ফোরাম | সাধারণ সম্পাদক: মোঃ জসিম উদ্দিন বাবুল</p>
     </footer>
 
@@ -448,7 +455,6 @@
         let isDarkMode = false;
         let currentThemeColor = 'blue';
 
-        // Color Theme Knobs Switcher
         function setThemeColor(color) {
             currentThemeColor = color;
             const header = document.getElementById('headerTheme');
@@ -463,11 +469,10 @@
             }
 
             header.className = `${headerBg} text-white shadow-xl py-5 px-4 border-b-4 border-amber-400 transition-colors duration-300`;
-            footer.className = `${footerBg} text-white py-6 text-center text-sm border-t-4 border-amber-400 mt-12 transition-colors duration-300`;
+            footer.className = `${footerBg} text-white py-6 text-center text-sm border-t-4 border-amber-400 mt-12 transition-colors duration-300 font-medium`;
             noticeBar.className = `${noticeBg} text-white shadow-md border-b border-black/20 transition-colors duration-300 py-2.5 px-4 flex items-center`;
         }
 
-        // Toggle Dark/Light Mode
         function toggleDarkMode() {
             isDarkMode = !isDarkMode;
             const body = document.getElementById('mainBody');
@@ -484,7 +489,7 @@
                 modeIcon.className = "fa-solid fa-sun text-amber-400";
                 modeText.innerText = "Light Mode";
             } else {
-                body.className = "bg-slate-100 text-slate-800 transition-colors duration-300";
+                body.className = "bg-slate-100 text-slate-900 transition-colors duration-300";
                 cards.forEach(c => {
                     c.classList.remove('bg-slate-900', 'border-slate-800');
                     c.classList.add('bg-white', 'border-slate-200');
@@ -494,7 +499,6 @@
             }
         }
 
-        // Admin Login & Logout Handler with Firebase Password Verification
         async function toggleAdminMode() {
             const { doc, getDoc } = window.FirestoreLib;
             let currentPassword = "2026";
@@ -533,7 +537,6 @@
             }
         }
 
-        // Change Password Function
         async function changeAdminPassword() {
             const { doc, setDoc } = window.FirestoreLib;
             const newPass = document.getElementById('newPasswordInput').value.trim();
@@ -548,7 +551,6 @@
             }
         }
 
-        // Firebase Sync Listeners
         document.addEventListener('firebase-ready', () => {
             loadAllDataFromFirebase();
         });
@@ -557,7 +559,6 @@
             const { collection, doc, onSnapshot } = window.FirestoreLib;
             const db = window.db;
 
-            // Notice Sync
             onSnapshot(doc(db, "settings", "notice"), (docSnap) => {
                 if (docSnap.exists()) {
                     const noticeText = docSnap.data().text;
@@ -566,14 +567,12 @@
                 }
             });
 
-            // Transactions Sync
             onSnapshot(collection(db, "transactions"), (snapshot) => {
                 let transactions = [];
                 snapshot.forEach(doc => { transactions.push({ id: doc.id, ...doc.data() }); });
                 renderLedger(transactions);
             });
 
-            // Gallery Sync
             onSnapshot(collection(db, "gallery"), (snapshot) => {
                 window.galleryImages = [];
                 snapshot.forEach(doc => { window.galleryImages.push({ id: doc.id, ...doc.data() }); });
@@ -581,15 +580,22 @@
                 renderGallery();
             });
 
-            // Committee Members Sync
             onSnapshot(collection(db, "committee"), (snapshot) => {
                 window.committeeMembers = [];
                 snapshot.forEach(doc => { window.committeeMembers.push({ id: doc.id, ...doc.data() }); });
-                window.committeeMembers.sort((a,b) => a.timestamp - b.timestamp);
+                
+                // Default Committee Seed Data if database is empty
+                if(window.committeeMembers.length === 0) {
+                    window.committeeMembers = [
+                        { id: 'def-1', name: 'মোঃ জসিম উদ্দিন বাবুল', role: 'সাধারণ সম্পাদক', img: 'https://via.placeholder.com/150', timestamp: 1 },
+                        { id: 'def-2', name: 'কার্যনির্বাহী সদস্যবৃন্দ', role: 'ভোলা ডেভেলপমেন্ট ফোরাম', img: 'https://via.placeholder.com/150', timestamp: 2 }
+                    ];
+                } else {
+                    window.committeeMembers.sort((a,b) => a.timestamp - b.timestamp);
+                }
                 renderCommittee();
             });
 
-            // Last Updated Time Stamp Update
             const nowStr = new Date().toLocaleString('bn-BD');
             document.getElementById('lastUpdateDisplay').innerText = nowStr;
         }
@@ -636,10 +642,10 @@
                 else totalExp += t.amount;
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800 transition";
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800 transition font-medium";
                 tr.innerHTML = `
                     <td class="p-3.5 whitespace-nowrap">${t.date}</td>
-                    <td class="p-3.5 font-medium">${t.desc}</td>
+                    <td class="p-3.5 font-semibold">${t.desc}</td>
                     <td class="p-3.5 whitespace-nowrap"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${t.type === 'Income' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">${t.type === 'Income' ? 'আয়' : 'ব্যয়'}</span></td>
                     <td class="p-3.5 text-right font-bold text-emerald-600">${t.type === 'Income' ? '৳ ' + t.amount.toLocaleString() : '-'}</td>
                     <td class="p-3.5 text-right font-bold text-rose-600">${t.type === 'Expense' ? '৳ ' + t.amount.toLocaleString() : '-'}</td>
@@ -658,9 +664,10 @@
             netDisp.className = `text-2xl md:text-3xl font-black mt-1 ${net >= 0 ? 'text-blue-600' : 'text-rose-600'}`;
         }
 
-        // Committee Management System
         let tempMemberImg = "https://via.placeholder.com/150";
-        window.committeeMembers = [];
+        window.committeeMembers = [
+            { id: 'def-1', name: 'মোঃ জসিম উদ্দিন বাবুল', role: 'সাধারণ সম্পাদক', img: 'https://via.placeholder.com/150', timestamp: 1 }
+        ];
 
         function handleMemberImgUpload(event) {
             const file = event.target.files[0];
@@ -697,6 +704,10 @@
 
         async function deleteCommitteeMember(id) {
             const { deleteDoc, doc } = window.FirestoreLib;
+            if(id.startsWith('def-')) {
+                alert("এটি ডিফল্ট ডাটা, ফায়ারবেজ থেকে নতুন সদস্য যোগ করলে এটি পরিবর্তিত হবে।");
+                return;
+            }
             if(confirm("আপনি কি এই সদস্যকে তালিকা থেকে বাদ দিতে চান?")) {
                 await deleteDoc(doc(window.db, "committee", id));
             }
@@ -721,10 +732,10 @@
                 const card = document.createElement('div');
                 card.className = "bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl flex items-center gap-4 relative shadow-sm";
                 card.innerHTML = `
-                    ${isAdmin ? `<button onclick="deleteCommitteeMember('${m.id}')" class="absolute top-3 right-3 text-rose-500 hover:text-rose-700 bg-white dark:bg-slate-900 w-7 h-7 rounded-full flex items-center justify-center shadow"><i class="fa-solid fa-trash-can text-xs"></i></button>` : ''}
+                    ${isAdmin && !m.id.startsWith('def-') ? `<button onclick="deleteCommitteeMember('${m.id}')" class="absolute top-3 right-3 text-rose-500 hover:text-rose-700 bg-white dark:bg-slate-900 w-7 h-7 rounded-full flex items-center justify-center shadow"><i class="fa-solid fa-trash-can text-xs"></i></button>` : ''}
                     <img src="${m.img}" alt="${m.name}" class="w-16 h-16 rounded-2xl object-cover border-2 border-amber-400 shadow">
                     <div>
-                        <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">${m.name}</h4>
+                        <h4 class="font-bold text-sm text-slate-900 dark:text-slate-100">${m.name}</h4>
                         <p class="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-0.5">${m.role}</p>
                     </div>
                 `;
@@ -732,7 +743,6 @@
             });
         }
 
-        // Gallery Management with Firebase
         let tempGalleryImgData = "";
         window.galleryImages = [];
 
