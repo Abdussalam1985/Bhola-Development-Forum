@@ -42,7 +42,6 @@
         .gallery-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1rem; }
         @media (min-width: 640px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 1024px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); } }
-        @media (min-width: 1280px) { .gallery-grid { grid-template-columns: repeat(4, 1fr); } }
         
         .gallery-item { position: relative; overflow: hidden; border-radius: 1rem; background: #f8fafc; transition: all 0.3s ease; }
         .gallery-item:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
@@ -55,10 +54,9 @@
         .gallery-delete { position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(239,68,68,0.9); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer; opacity: 0; transition: opacity 0.3s; z-index: 10; }
         .gallery-item:hover .gallery-delete { opacity: 1; }
         
-        .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 1rem; opacity: 0; transition: opacity 0.3s; }
-        .lightbox.active { display: flex; opacity: 1; }
+        .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 1rem; }
+        .lightbox.active { display: flex; }
         .lightbox-img { max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: 0.5rem; }
-        .lightbox-close { position: absolute; top: 1rem; right: 1rem; color: white; font-size: 1.5rem; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.1); }
         .upload-zone { border: 2px dashed #cbd5e1; border-radius: 1rem; padding: 1.5rem; text-align: center; transition: all 0.3s; cursor: pointer; background: #fafafa; }
         .upload-zone:hover { border-color: #3b82f6; background: #eff6ff; }
     </style>
@@ -66,14 +64,13 @@
 <body id="mainBody" class="bg-slate-100 text-slate-900 transition-colors duration-300">
 
     <!-- Lightbox Modal -->
-    <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
-        <div class="lightbox-close" onclick="closeLightboxDirect()"><i class="fa-solid fa-xmark"></i></div>
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <div class="absolute top-4 right-4 text-white text-2xl cursor-pointer"><i class="fa-solid fa-xmark"></i></div>
         <img id="lightboxImg" src="" class="lightbox-img" onclick="event.stopPropagation()">
-        <div id="lightboxCaption" class="text-white mt-3 text-sm font-medium"></div>
     </div>
 
-    <!-- Header -->
-    <header id="headerTheme" class="bg-blue-900 text-white shadow-xl py-5 px-4 border-b-4 border-amber-400">
+    <!-- Top Government-style Header Bar -->
+    <header id="headerTheme" class="bg-blue-900 text-white shadow-xl py-4 px-4 border-b-4 border-amber-400 transition-colors">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-4 text-center md:text-left">
                 <div class="relative group cursor-pointer" onclick="triggerLogoUpload()">
@@ -86,11 +83,10 @@
                 <input type="file" id="logoFileInput" class="hidden" accept="image/*" onchange="handleLogoUpload(event)">
                 
                 <div>
-                    <h1 class="text-xl md:text-3xl font-bold tracking-wide">ভোলা জেলা উন্নয়ন কর্তৃপক্ষ</h1>
-                    <p class="text-xs md:text-sm text-blue-100 mt-1 font-medium">
-                        <span>আধুনিক ও টেকসই জেলা গড়ার প্রত্যয়</span>
-                    </p>
-                    <!-- Admin Only Logo Save Button -->
+                    <h1 class="text-xl md:text-2xl font-bold tracking-wide">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</h1>
+                    <h2 class="text-lg md:text-xl font-bold text-amber-300">ভোলা জেলা উন্নয়ন কর্তৃপক্ষ</h2>
+                    <p class="text-xs text-blue-100 mt-0.5">সরকারি পোর্টাল ও ব্যবস্থাপনা সিস্টেম</p>
+                    
                     <div id="logoSaveAction" class="hidden mt-2">
                         <button onclick="saveLogoToFirebase()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold px-3 py-1 rounded-lg shadow transition flex items-center gap-1">
                             <i class="fa-solid fa-cloud-arrow-up"></i> লোগো সেভ করুন
@@ -99,10 +95,10 @@
                 </div>
             </div>
             
-            <div class="flex flex-wrap items-center justify-center gap-2.5">
+            <div class="flex flex-wrap items-center justify-center gap-2">
                 <button onclick="toggleDarkMode()" class="bg-black/20 hover:bg-black/30 border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
                     <i id="modeIcon" class="fa-solid fa-moon"></i>
-                    <span id="modeText">Dark Mode</span>
+                    <span id="modeText">Dark</span>
                 </button>
                 <button id="authBtn" onclick="toggleAdminMode()" class="bg-amber-400 text-blue-950 font-bold text-xs px-4 py-2 rounded-xl shadow flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-lock"></i> <span>অ্যাডমিন লগইন</span>
@@ -111,169 +107,252 @@
         </div>
     </header>
 
+    <!-- Government Navigation Menu Bar (Tabs) -->
+    <nav id="navBarTheme" class="bg-blue-950 text-white shadow-md sticky top-0 z-50 border-b border-blue-900 transition-colors">
+        <div class="max-w-6xl mx-auto px-4 flex flex-wrap items-center justify-between text-xs md:text-sm font-semibold">
+            <div class="flex items-center overflow-x-auto py-2 gap-1 md:gap-2">
+                <button onclick="switchTab('home')" class="nav-tab px-3 py-2 rounded-lg bg-blue-800 text-white transition flex items-center gap-1.5"><i class="fa-solid fa-house"></i> হোম</button>
+                <button onclick="switchTab('about')" class="nav-tab px-3 py-2 rounded-lg hover:bg-blue-900 transition flex items-center gap-1.5"><i class="fa-solid fa-circle-info"></i> ভূমিকা ও পরিচিতি</button>
+                <button onclick="switchTab('committee')" class="nav-tab px-3 py-2 rounded-lg hover:bg-blue-900 transition flex items-center gap-1.5"><i class="fa-solid fa-users"></i> কমিটি <i class="fa-solid fa-lock text-[10px] text-amber-400"></i></button>
+                <button onclick="switchTab('finance')" class="nav-tab px-3 py-2 rounded-lg hover:bg-blue-900 transition flex items-center gap-1.5"><i class="fa-solid fa-wallet"></i> আর্থিক হিসাব <i class="fa-solid fa-lock text-[10px] text-amber-400"></i></button>
+                <button onclick="switchTab('gallery')" class="nav-tab px-3 py-2 rounded-lg hover:bg-blue-900 transition flex items-center gap-1.5"><i class="fa-solid fa-images"></i> গ্যালারি</button>
+            </div>
+            
+            <div id="adminThemeControl" class="hidden py-2">
+                <label class="text-[11px] text-amber-300 mr-1"><i class="fa-solid fa-palette"></i> থিম কালার:</label>
+                <select id="themeColorSelect" onchange="changeThemeColor(this.value)" class="bg-blue-900 text-white text-xs p-1 rounded border border-blue-700 outline-none">
+                    <option value="blue">ক্লাসিক নীল (Blue)</option>
+                    <option value="emerald">সবুজ সরকারি (Emerald)</option>
+                    <option value="slate">আধুনিক ছাই (Slate)</option>
+                    <option value="indigo">রয়েল ইন্ডিগো (Indigo)</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
     <!-- Main Container -->
     <main class="max-w-6xl mx-auto px-4 py-6 space-y-8">
 
-        <!-- Introduction & Overview Section -->
-        <section class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-4 fade-in">
-            <div class="flex justify-between items-center border-b pb-3">
-                <h2 class="text-base md:text-lg font-bold text-blue-900 flex items-center gap-2">
-                    <i class="fa-solid fa-circle-info text-amber-500"></i> ভূমিকা ও পরিচিতি
-                </h2>
-                <button id="editIntroBtn" onclick="toggleIntroEdit()" class="hidden bg-slate-200 text-slate-800 text-xs px-3 py-1 rounded-lg font-semibold">এডিট</button>
-            </div>
-            <div id="introDisplayView">
-                <p id="displayIntroText" class="text-sm text-slate-700 leading-relaxed">ভোলা জেলা উন্নয়ন কর্তৃপক্ষ একটি সেবামূলক ও প্রশাসনিক উন্নয়নমূলক প্ল্যাটফর্ম। জেলার সামগ্রিক অবকাঠামো, শিক্ষা, স্বাস্থ্য ও জীবনমান উন্নয়নের লক্ষ্যে এই পোর্টালে বিভিন্ন কার্যক্রম পরিচালিত হয়।</p>
-            </div>
-            <div id="introEditView" class="hidden space-y-3">
-                <textarea id="inputIntroText" class="w-full p-3 border rounded-xl text-xs" rows="3"></textarea>
-                <div class="flex justify-end gap-2">
-                    <button onclick="cancelIntroEdit()" class="px-3 py-1.5 bg-gray-200 text-xs rounded-lg">বাতিল</button>
-                    <button onclick="saveIntroToFirebase()" class="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg font-bold flex items-center gap-1">
-                        <i class="fa-solid fa-floppy-disk"></i> ভূমিকা সেভ করুন
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Vision, Mission & Dynamic Sections Management -->
-        <section class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-6 fade-in">
-            <div class="flex justify-between items-center flex-wrap gap-3 border-b pb-4">
-                <div>
-                    <h2 class="text-lg md:text-xl font-bold text-blue-900 flex items-center gap-2">
-                        <i class="fa-solid fa-bullseye text-amber-500"></i> লক্ষ্য, উদ্দেশ্য ও বিভিন্ন বিভাগীয় কার্যক্রম
+        <!-- TAB 1: HOME & GOALS -->
+        <section id="tab-home" class="tab-content space-y-6 fade-in">
+            <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-6">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <h2 class="text-base md:text-lg font-bold text-blue-900 flex items-center gap-2">
+                        <i class="fa-solid fa-bullseye text-amber-500"></i> লক্ষ্য, উদ্দেশ্য ও বিভাগীয় কার্যক্রম
                     </h2>
-                    <p class="text-xs text-slate-500 mt-1">দৃষ্টিভঙ্গি এবং বিভিন্ন খাতভিত্তিক (যেমন: অবকাঠামো, শিক্ষা ইত্যাদি) লক্ষ্যসমূহ</p>
-                </div>
-                <button id="editGoalsBtn" onclick="toggleGoalsEditMode()" class="hidden bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-blue-700 shadow transition">
-                    <i class="fa-solid fa-pen-to-square mr-1"></i> সেকশনগুলো এডিট ও নতুন যোগ করুন
-                </button>
-            </div>
-
-            <!-- Frontend Display View -->
-            <div id="goalsDisplayView" class="space-y-6">
-                <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-xl">
-                    <h4 class="font-bold text-blue-900 text-sm mb-1"><i class="fa-solid fa-eye mr-1"></i> দৃষ্টিভঙ্গি (Vision):</h4>
-                    <p id="displayVisionText" class="text-slate-700 text-sm leading-relaxed">ভোলা জেলার টেকসই উন্নয়ন, আধুনিক প্রযুক্তিভিত্তিক সেবা এবং একটি জ্ঞানভিত্তিক ও স্বাবলম্বী জনপদ গড়ে তোলা।</p>
+                    <button id="editGoalsBtn" onclick="toggleGoalsEditMode()" class="hidden bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-xl shadow">এডিট করুন</button>
                 </div>
 
-                <div>
-                    <h4 class="font-bold text-slate-800 text-sm mb-3">খাতভিত্তিক লক্ষ্য ও উদ্দেশ্যসমূহ (যেমন: অবকাঠামো, শিক্ষা, ইত্যাদি):</h4>
-                    <div id="displayObjectivesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Dynamic Cards will load here -->
+                <div id="goalsDisplayView" class="space-y-6">
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-xl">
+                        <h4 class="font-bold text-blue-900 text-sm mb-1">দৃষ্টিভঙ্গি (Vision):</h4>
+                        <p id="displayVisionText" class="text-slate-700 text-sm leading-relaxed">ভোলা জেলার টেকসই উন্নয়ন, আধুনিক প্রযুক্তিভিত্তিক সেবা এবং একটি জ্ঞানভিত্তিক ও স্বাবলম্বী জনপদ গড়ে তোলা।</p>
                     </div>
-                </div>
-            </div>
-
-            <!-- Admin Edit Form -->
-            <div id="goalsEditFormView" class="hidden space-y-4 bg-slate-50 p-5 rounded-xl border border-slate-200">
-                <h4 class="font-bold text-xs text-blue-600 uppercase tracking-wide">অ্যাডমিন প্যানেল: ভিশন ও খাতভিত্তিক ঘর (Sections) ম্যানেজমেন্ট</h4>
-                
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">ভিশন (Vision):</label>
-                    <textarea id="inputVision" class="w-full p-2.5 rounded-xl border border-slate-300 text-xs bg-white outline-none" rows="2"></textarea>
+                    <div id="displayObjectivesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
 
-                <div class="space-y-2">
-                    <div class="flex justify-between items-center">
-                        <label class="block text-xs font-bold text-slate-600">খাত ও বিভাগসমূহ (Infrastructure, Education, etc.):</label>
-                        <button type="button" onclick="addObjectiveInputField()" class="bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-emerald-700">
-                            <i class="fa-solid fa-plus mr-1"></i> নতুন ঘর/খাত যোগ করুন
-                        </button>
+                <div id="goalsEditFormView" class="hidden space-y-4 bg-slate-50 p-5 rounded-xl border">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">ভিশন (Vision):</label>
+                        <textarea id="inputVision" class="w-full p-2.5 rounded-xl border text-xs bg-white" rows="2"></textarea>
                     </div>
-                    <div id="editObjectivesContainer" class="space-y-3"></div>
-                </div>
-
-                <div class="flex justify-end gap-2 pt-3 border-t">
-                    <button onclick="cancelGoalsEdit()" class="bg-slate-300 text-slate-800 text-xs font-bold px-4 py-2 rounded-xl">বাতিল</button>
-                    <button onclick="saveGoalsToFirebase()" class="bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-blue-700 shadow flex items-center gap-1">
-                        <i class="fa-solid fa-floppy-disk"></i> পরিবর্তনগুলো সেভ করুন
-                    </button>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label class="block text-xs font-bold text-slate-600">বিভাগ ও খাতসমূহ:</label>
+                            <button type="button" onclick="addObjectiveInputField()" class="bg-emerald-600 text-white text-xs px-3 py-1 rounded-lg">+ নতুন খাত</button>
+                        </div>
+                        <div id="editObjectivesContainer" class="space-y-3"></div>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-3 border-t">
+                        <button onclick="cancelGoalsEdit()" class="bg-slate-300 text-xs px-4 py-2 rounded-xl">বাতিল</button>
+                        <button onclick="saveGoalsToFirebase()" class="bg-blue-600 text-white text-xs px-4 py-2 rounded-xl font-bold">সেভ করুন</button>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- GALLERY CORNER SECTION -->
-        <section id="gallerySection" class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-5 fade-in">
-            <div class="flex justify-between items-center flex-wrap gap-3">
-                <h3 class="font-bold text-sm md:text-base flex items-center gap-2">
-                    <i class="fa-solid fa-images text-blue-600"></i> কার্যক্রম ও ফটো গ্যালারি কর্নার
-                </h3>
-                <span id="galleryCountBadge" class="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-semibold">0 ছবি</span>
+        <!-- TAB 2: ABOUT / INTRO -->
+        <section id="tab-about" class="tab-content hidden space-y-6 fade-in">
+            <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-4">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <h2 class="text-base md:text-lg font-bold text-blue-900 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-amber-500"></i> ভূমিকা ও পরিচিতি
+                    </h2>
+                    <button id="editIntroBtn" onclick="toggleIntroEdit()" class="hidden bg-slate-200 text-slate-800 text-xs px-3 py-1 rounded-lg font-semibold">এডিট</button>
+                </div>
+                <div id="introDisplayView">
+                    <p id="displayIntroText" class="text-sm text-slate-700 leading-relaxed">ভোলা জেলা উন্নয়ন কর্তৃপক্ষ একটি সেবামূলক ও প্রশাসনিক উন্নয়নমূলক প্ল্যাটফর্ম।</p>
+                </div>
+                <div id="introEditView" class="hidden space-y-3">
+                    <textarea id="inputIntroText" class="w-full p-3 border rounded-xl text-xs" rows="4"></textarea>
+                    <div class="flex justify-end gap-2">
+                        <button onclick="cancelIntroEdit()" class="px-3 py-1.5 bg-gray-200 text-xs rounded-lg">বাতিল</button>
+                        <button onclick="saveIntroToFirebase()" class="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg font-bold">ভূমিকা সেভ করুন</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: COMMITTEE (Secured/Locked Menu) -->
+        <section id="tab-committee" class="tab-content hidden space-y-6 fade-in">
+            <div id="committeeLockScreen" class="bg-white border p-8 rounded-2xl text-center max-w-md mx-auto shadow-sm space-y-4">
+                <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="font-bold text-base text-slate-800">কমিটি তথ্য সুরক্ষিত</h3>
+                <p class="text-xs text-slate-500">এই তথ্যগুলো দেখতে বা এডিট করতে কমিটির পাসওয়ার্ড দিন (ডিফল্ট: 2026 বা অ্যাডমিন পাসওয়ার্ড)।</p>
+                <input type="password" id="committeePasswordInput" placeholder="পাসওয়ার্ড লিখুন..." class="w-full p-2.5 text-center text-xs border rounded-xl outline-none">
+                <button onclick="verifyCommitteeAccess()" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl text-xs">প্রবেশ করুন</button>
             </div>
 
-            <!-- Admin Upload Panel with Explicit Save Button -->
-            <div id="galleryUploadPanel" class="hidden space-y-4 bg-slate-50 p-4 rounded-xl border">
-                <div class="upload-zone" onclick="document.getElementById('galleryFileInput').click()">
-                    <input type="file" id="galleryFileInput" class="hidden" accept="image/*" onchange="handleGalleryUpload(event)">
-                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-500 mb-1"></i>
-                    <p class="text-xs font-bold text-slate-700">ছবি পরিবর্তন বা নির্বাচন করতে এখানে ক্লিক করুন</p>
+            <div id="committeeContentScreen" class="hidden bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-4">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <h2 class="text-base font-bold text-blue-900"><i class="fa-solid fa-users text-amber-500 mr-2"></i> কতৃপক্ষ ও কমিটি সদস্যবৃন্দ</h2>
+                    <button onclick="saveCommitteeData()" class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-lg">কমিটি সেভ করুন</button>
+                </div>
+                <div id="committeeMembersList" class="space-y-3">
+                    <!-- Dynamic Committee Member Cards -->
+                </div>
+                <button onclick="addCommitteeMember()" class="text-xs text-blue-600 font-bold hover:underline">+ নতুন সদস্য যোগ করুন</button>
+            </div>
+        </section>
+
+        <!-- TAB 4: FINANCE / ACCOUNTS (Secured/Locked Menu) -->
+        <section id="tab-finance" class="tab-content hidden space-y-6 fade-in">
+            <div id="financeLockScreen" class="bg-white border p-8 rounded-2xl text-center max-w-md mx-auto shadow-sm space-y-4">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+                    <i class="fa-solid fa-vault"></i>
+                </div>
+                <h3 class="font-bold text-base text-slate-800">আর্থিক ব্যবস্থাপনা ও হিসাব বিভাগ</h3>
+                <p class="text-xs text-slate-500">এটি গোপনীয় বিভাগ। হিসাব দেখতে পাসওয়ার্ড প্রদান করুন।</p>
+                <input type="password" id="financePasswordInput" placeholder="পাসওয়ার্ড লিখুন..." class="w-full p-2.5 text-center text-xs border rounded-xl outline-none">
+                <button onclick="verifyFinanceAccess()" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs">হিসাব প্যানেলে প্রবেশ করুন</button>
+            </div>
+
+            <div id="financeContentScreen" class="hidden bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-4">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <h2 class="text-base font-bold text-blue-900"><i class="fa-solid fa-wallet text-emerald-500 mr-2"></i> আর্থিক হিসাব ও বাজেট ব্যবস্থাপনা</h2>
+                    <button onclick="saveFinanceData()" class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-lg">হিসাব সেভ করুন</button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-slate-50 p-4 rounded-xl border">
+                        <span class="text-[11px] text-slate-500 font-semibold">মোট বরাদ্দ / ফান্ড</span>
+                        <input type="number" id="financeTotalFund" class="w-full font-bold text-lg bg-white border p-2 rounded-lg mt-1" value="0">
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border">
+                        <span class="text-[11px] text-slate-500 font-semibold">মোট ব্যয়</span>
+                        <input type="number" id="financeTotalExpense" class="w-full font-bold text-lg bg-white border p-2 rounded-lg mt-1" value="0">
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border">
+                        <span class="text-[11px] text-slate-500 font-semibold">অবশিষ্ট স্থিতি</span>
+                        <h3 id="financeBalance" class="font-bold text-lg text-emerald-600 mt-2">৳ ০</h3>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">হিসাবের বিবরণ বা মন্তব্য নোট:</label>
+                    <textarea id="financeNotes" class="w-full p-3 border rounded-xl text-xs" rows="3" placeholder="আর্থিক বিবরণী বা খরচের খাতসমূহ এখানে লিখুন..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: GALLERY -->
+        <section id="tab-gallery" class="tab-content hidden space-y-6 fade-in">
+            <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-5">
+                <div class="flex justify-between items-center flex-wrap gap-3">
+                    <h3 class="font-bold text-sm md:text-base flex items-center gap-2">
+                        <i class="fa-solid fa-images text-blue-600"></i> কার্যক্রম ও ফটো গ্যালারি কর্নার
+                    </h3>
+                    <span id="galleryCountBadge" class="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-semibold">0 ছবি</span>
                 </div>
 
-                <div id="galleryPreviewArea" class="hidden flex items-center gap-4 bg-white p-3 rounded-xl border">
-                    <img id="galleryPreviewImg" src="" class="w-20 h-20 rounded-lg object-cover border">
-                    <div class="flex-1">
-                        <p class="text-xs font-semibold text-emerald-600 mb-1"><i class="fa-solid fa-check-circle"></i> ছবি সিলেক্ট হয়েছে</p>
-                        <p class="text-[11px] text-slate-500">নিচে ক্যাপশন লিখে 'গ্যালারিতে সেভ করুন' বাটনে চাপ দিন।</p>
+                <div id="galleryUploadPanel" class="hidden space-y-4 bg-slate-50 p-4 rounded-xl border">
+                    <div class="upload-zone" onclick="document.getElementById('galleryFileInput').click()">
+                        <input type="file" id="galleryFileInput" class="hidden" accept="image/*" onchange="handleGalleryUpload(event)">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-500 mb-1"></i>
+                        <p class="text-xs font-bold text-slate-700">ছবি পরিবর্তন বা নির্বাচন করতে এখানে ক্লিক করুন</p>
+                    </div>
+                    <div id="galleryPreviewArea" class="hidden flex items-center gap-4 bg-white p-3 rounded-xl border">
+                        <img id="galleryPreviewImg" src="" class="w-16 h-16 rounded-lg object-cover border">
+                        <input type="text" id="galleryCaptionInput" placeholder="ছবির ক্যাপশন..." class="w-full p-2 border rounded-lg text-xs">
+                    </div>
+                    <div class="flex justify-end">
+                        <button onclick="saveGalleryImage()" class="bg-emerald-600 text-white font-bold py-2 px-5 rounded-xl text-xs shadow">গ্যালারিতে ছবি সেভ করুন</button>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">ছবির বিবরণ / ক্যাপশন</label>
-                    <input type="text" id="galleryCaptionInput" placeholder="যেমন: ভোলা উন্নয়ন সভা ২০২৬..." class="w-full p-2.5 rounded-xl border border-slate-300 text-xs bg-white outline-none">
-                </div>
-
-                <div class="flex justify-end">
-                    <button onclick="saveGalleryImage()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-floppy-disk text-sm"></i> গ্যালারিতে ছবি সেভ করুন
-                    </button>
-                </div>
-            </div>
-
-            <!-- Gallery Grid -->
-            <div id="galleryGrid" class="gallery-grid"></div>
-            <div id="galleryEmpty" class="text-center py-10">
-                <i class="fa-regular fa-images text-4xl text-slate-300 mb-3"></i>
-                <p class="text-sm text-slate-500">এখনো কোনো ছবি যোগ করা হয়নি।</p>
+                <div id="galleryGrid" class="gallery-grid"></div>
+                <div id="galleryEmpty" class="text-center py-10 text-slate-400 text-xs">কোনো ছবি নেই।</div>
             </div>
         </section>
 
     </main>
 
     <!-- Footer -->
-    <footer class="bg-blue-900 text-white py-6 text-center text-sm border-t-4 border-amber-400 mt-12 font-medium">
+    <footer class="bg-blue-900 text-white py-6 text-center text-sm border-t-4 border-amber-400 mt-12 font-medium transition-colors" id="footerTheme">
         <p>© 2026 ভোলা জেলা উন্নয়ন কর্তৃপক্ষ | সর্বস্বত্ব সংরক্ষিত</p>
     </footer>
 
-    <!-- JavaScript & Firebase Handlers -->
+    <!-- JavaScript & Handlers -->
     <script>
         let isAdmin = false;
         let isDarkMode = false;
-        let tempGalleryImgData = "";
         let tempLogoData = "";
+        let tempGalleryImgData = "";
         window.galleryImages = [];
-        window.portalIntroData = "ভোলা জেলা উন্নয়ন কর্তৃপক্ষ একটি সেবামূলক ও প্রশাসনিক উন্নয়নমূলক প্ল্যাটফর্ম। জেলার সামগ্রিক অবকাঠামো, শিক্ষা, স্বাস্থ্য ও জীবনমান উন্নয়নের লক্ষ্যে এই পোর্টালে বিভিন্ন কার্যক্রম পরিচালিত হয়।";
-        window.portalGoalsData = {
-            vision: "ভোলা জেলার টেকসই উন্নয়ন, আধুনিক প্রযুক্তিভিত্তিক সেবা এবং একটি জ্ঞানভিত্তিক ও স্বাবলম্বী জনপদ গড়ে তোলা।",
-            objectives: [
-                { category: "শিক্ষা ও মানব সম্পদ", title: "মানসম্মত শিক্ষা বিস্তার", desc: "জেলার শিক্ষা প্রতিষ্ঠানে আধুনিক প্রযুক্তির ছোঁয়া ও মানসম্মত পাঠদান নিশ্চিতকরণ।" },
-                { category: "অবকাঠামো", title: "টেকসই যোগাযোগ ব্যবস্থা", desc: "গ্রামীণ ও শহরাঞ্চলের যোগাযোগ ব্যবস্থার উন্নয়ন ও নদী ভাঙন রোধে কার্যকর পদক্ষেপ।" }
-            ]
-        };
+        window.portalIntroData = "ভোলা জেলা উন্নয়ন কর্তৃপক্ষ একটি সেবামূলক ও প্রশাসনিক উন্নয়নমূলক প্ল্যাটফর্ম।";
+        window.portalGoalsData = { vision: "ভোলা জেলার টেকসই উন্নয়ন...", objectives: [] };
+        window.committeeData = [{ name: "ড. মো. রফিকুল ইসলাম", role: "সভাপতি", phone: "01700000000" }];
+        window.financeData = { fund: 500000, expense: 120000, notes: "প্রাথমিক বাজেট বরাদ্দ ও খরচ।" };
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-tab').forEach(el => el.className = "nav-tab px-3 py-2 rounded-lg hover:bg-blue-900 transition flex items-center gap-1.5");
+            
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            event.currentTarget.className = "nav-tab px-3 py-2 rounded-lg bg-blue-800 text-white transition flex items-center gap-1.5";
+        }
 
         function toggleDarkMode() {
             isDarkMode = !isDarkMode;
-            const body = document.getElementById('mainBody');
-            const modeIcon = document.getElementById('modeIcon');
-            const modeText = document.getElementById('modeText');
-            if(isDarkMode) {
-                body.className = "bg-slate-950 text-slate-100 transition-colors duration-300";
-                modeIcon.className = "fa-solid fa-sun text-amber-400";
-                modeText.innerText = "Light Mode";
+            document.getElementById('mainBody').className = isDarkMode ? "bg-slate-950 text-slate-100 transition-colors duration-300" : "bg-slate-100 text-slate-900 transition-colors duration-300";
+            document.getElementById('modeIcon').className = isDarkMode ? "fa-solid fa-sun text-amber-400" : "fa-solid fa-moon";
+            document.getElementById('modeText').innerText = isDarkMode ? "Light" : "Dark";
+        }
+
+        function changeThemeColor(color) {
+            const header = document.getElementById('headerTheme');
+            const nav = document.getElementById('navBarTheme');
+            const footer = document.getElementById('footerTheme');
+            
+            let bgClass = "bg-blue-900", navClass = "bg-blue-950";
+            if(color === 'emerald') { bgClass = "bg-emerald-900"; navClass = "bg-emerald-950"; }
+            else if(color === 'slate') { bgClass = "bg-slate-900"; navClass = "bg-slate-950"; }
+            else if(color === 'indigo') { bgClass = "bg-indigo-900"; navClass = "bg-indigo-950"; }
+
+            header.className = `${bgClass} text-white shadow-xl py-4 px-4 border-b-4 border-amber-400 transition-colors`;
+            nav.className = `${navClass} text-white shadow-md sticky top-0 z-50 border-b border-blue-900 transition-colors`;
+            footer.className = `${bgClass} text-white py-6 text-center text-sm border-t-4 border-amber-400 mt-12 font-medium transition-colors`;
+        }
+
+        function verifyCommitteeAccess() {
+            const pass = document.getElementById('committeePasswordInput').value;
+            if(pass === "2026" || pass === "admin" || isAdmin) {
+                document.getElementById('committeeLockScreen').classList.add('hidden');
+                document.getElementById('committeeContentScreen').classList.remove('hidden');
+                renderCommittee();
             } else {
-                body.className = "bg-slate-100 text-slate-900 transition-colors duration-300";
-                modeIcon.className = "fa-solid fa-moon";
-                modeText.innerText = "Dark Mode";
+                alert("ভুল পাসওয়ার্ড!");
+            }
+        }
+
+        function verifyFinanceAccess() {
+            const pass = document.getElementById('financePasswordInput').value;
+            if(pass === "2026" || pass === "admin" || isAdmin) {
+                document.getElementById('financeLockScreen').classList.add('hidden');
+                document.getElementById('financeContentScreen').classList.remove('hidden');
+                renderFinance();
+            } else {
+                alert("ভুল পাসওয়ার্ড!");
             }
         }
 
@@ -286,62 +365,62 @@
                     document.getElementById('editGoalsBtn').classList.remove('hidden');
                     document.getElementById('editIntroBtn').classList.remove('hidden');
                     document.getElementById('galleryUploadPanel').classList.remove('hidden');
+                    document.getElementById('adminThemeControl').classList.remove('hidden');
                     if(tempLogoData) document.getElementById('logoSaveAction').classList.remove('hidden');
+                    
+                    // Unlock secured tabs automatically for admin
+                    document.getElementById('committeeLockScreen').classList.add('hidden');
+                    document.getElementById('committeeContentScreen').classList.remove('hidden');
+                    document.getElementById('financeLockScreen').classList.add('hidden');
+                    document.getElementById('financeContentScreen').classList.remove('hidden');
+                    renderCommittee();
+                    renderFinance();
                     renderGallery();
-                    alert("অ্যাডমিন মোড সফলভাবে সক্রিয় হয়েছে! এখন যেকোনো পরিবর্তন সেভ করতে পারবেন।");
-                } else if(pass !== null) {
-                    alert("ভুল পাসওয়ার্ড!");
-                }
+                    alert("অ্যাডমিন মোড সক্রিয় হয়েছে!");
+                } else if(pass !== null) { alert("ভুল পাসওয়ার্ড!"); }
             } else {
                 isAdmin = false;
                 document.getElementById('authBtn').innerHTML = `<i class="fa-solid fa-lock"></i> অ্যাডমিন লগইন`;
                 document.getElementById('editGoalsBtn').classList.add('hidden');
                 document.getElementById('editIntroBtn').classList.add('hidden');
                 document.getElementById('galleryUploadPanel').classList.add('hidden');
-                document.getElementById('logoSaveAction').classList.add('hidden');
-                document.getElementById('goalsEditFormView').classList.add('hidden');
-                document.getElementById('goalsDisplayView').classList.remove('hidden');
-                document.getElementById('introEditView').classList.add('hidden');
-                document.getElementById('introDisplayView').classList.remove('hidden');
-                renderGallery();
+                document.getElementById('adminThemeControl').classList.add('hidden');
+                document.getElementById('committeeContentScreen').classList.add('hidden');
+                document.getElementById('committeeLockScreen').classList.remove('hidden');
+                document.getElementById('financeContentScreen').classList.add('hidden');
+                document.getElementById('financeLockScreen').classList.remove('hidden');
             }
         }
 
-        // Firebase Sync Listener (Real-time Universal Update for ALL Devices)
+        // Firebase Synchronizations
         document.addEventListener('firebase-ready', () => {
             const { doc, collection, onSnapshot } = window.FirestoreLib;
             const db = window.db;
 
-            // 1. Load Logo Universal Sync
-            onSnapshot(doc(db, "portal_content", "bhola_logo"), (docSnap) => {
-                if (docSnap.exists() && docSnap.data().img) {
-                    document.getElementById('logoDisplay').src = docSnap.data().img;
-                }
+            onSnapshot(doc(db, "portal_content", "bhola_logo"), docSnap => {
+                if(docSnap.exists() && docSnap.data().img) document.getElementById('logoDisplay').src = docSnap.data().img;
             });
-
-            // 2. Load Vision & Dynamic Objectives Universal Sync
-            onSnapshot(doc(db, "portal_content", "bhola_goals"), (docSnap) => {
-                if (docSnap.exists()) {
-                    window.portalGoalsData = docSnap.data();
-                }
-                renderGoals();
-            });
-
-            // 3. Load Intro Text Universal Sync
-            onSnapshot(doc(db, "portal_content", "bhola_intro"), (docSnap) => {
-                if (docSnap.exists()) {
-                    window.portalIntroData = docSnap.data().text || window.portalIntroData;
+            onSnapshot(doc(db, "portal_content", "bhola_intro"), docSnap => {
+                if(docSnap.exists()) {
+                    window.portalIntroData = docSnap.data().text || '';
                     document.getElementById('displayIntroText').innerText = window.portalIntroData;
                 }
             });
-
-            // 4. Load Gallery Images Universal Sync
-            onSnapshot(collection(db, "gallery"), (snapshot) => {
+            onSnapshot(doc(db, "portal_content", "bhola_goals"), docSnap => {
+                if(docSnap.exists()) window.portalGoalsData = docSnap.data();
+                renderGoals();
+            });
+            onSnapshot(doc(db, "portal_content", "bhola_committee"), docSnap => {
+                if(docSnap.exists()) window.committeeData = docSnap.data().members || [];
+                renderCommittee();
+            });
+            onSnapshot(doc(db, "portal_content", "bhola_finance"), docSnap => {
+                if(docSnap.exists()) window.financeData = docSnap.data();
+                renderFinance();
+            });
+            onSnapshot(collection(db, "gallery"), snapshot => {
                 window.galleryImages = [];
-                snapshot.forEach(docSnap => { 
-                    window.galleryImages.push({ id: docSnap.id, ...docSnap.data() }); 
-                });
-                window.galleryImages.sort((a,b) => b.timestamp - a.timestamp);
+                snapshot.forEach(d => window.galleryImages.push({ id: d.id, ...d.data() }));
                 renderGallery();
             });
         });
@@ -350,57 +429,75 @@
             document.getElementById('displayVisionText').innerText = window.portalGoalsData.vision || '';
             const grid = document.getElementById('displayObjectivesGrid');
             grid.innerHTML = '';
-            
-            if(window.portalGoalsData.objectives && window.portalGoalsData.objectives.length > 0) {
+            if(window.portalGoalsData.objectives) {
                 window.portalGoalsData.objectives.forEach(obj => {
-                    const card = document.createElement('div');
-                    card.className = "bg-slate-50 border border-slate-200 p-4 rounded-xl shadow-sm";
-                    card.innerHTML = `
-                        <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">${obj.category}</span>
-                        <h5 class="font-bold text-slate-800 text-sm mt-2">${obj.title}</h5>
-                        <p class="text-xs text-slate-600 mt-1">${obj.desc}</p>
-                    `;
-                    grid.appendChild(card);
+                    grid.innerHTML += `<div class="bg-slate-50 border p-4 rounded-xl"><span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">${obj.category}</span><h5 class="font-bold text-sm mt-2">${obj.title}</h5><p class="text-xs text-slate-600 mt-1">${obj.desc}</p></div>`;
                 });
-            } else {
-                grid.innerHTML = `<p class="text-xs text-slate-400 italic">কোনো বিভাগ বা ঘর যোগ করা হয়নি।</p>`;
             }
         }
 
-        // Logo Upload & Save Handlers
-        function triggerLogoUpload() { 
-            if(isAdmin) document.getElementById('logoFileInput').click(); 
-            else alert("লোগো পরিবর্তন করতে প্রথমে অ্যাডমিন লগইন করুন।");
-        }
-        
-        function handleLogoUpload(e) {
-            const file = e.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    tempLogoData = evt.target.result;
-                    document.getElementById('logoDisplay').src = tempLogoData;
-                    if(isAdmin) {
-                        document.getElementById('logoSaveAction').classList.remove('hidden');
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
+        function renderCommittee() {
+            const list = document.getElementById('committeeMembersList');
+            if(!list) return;
+            list.innerHTML = '';
+            window.committeeData.forEach((m, idx) => {
+                list.innerHTML += `<div class="p-3 bg-slate-50 border rounded-xl flex gap-2 items-center"><input type="text" value="${m.name}" placeholder="নাম" class="comm-name p-2 text-xs border rounded w-1/3"><input type="text" value="${m.role}" placeholder="পদবি" class="comm-role p-2 text-xs border rounded w-1/3"><input type="text" value="${m.phone}" placeholder="ফোন" class="comm-phone p-2 text-xs border rounded w-1/3"><button onclick="this.parentElement.remove()" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div>`;
+            });
         }
 
-        async function saveLogoToFirebase() {
-            if(!tempLogoData) return;
+        function addCommitteeMember() {
+            window.committeeData.push({ name: "", role: "", phone: "" });
+            renderCommittee();
+        }
+
+        async function saveCommitteeData() {
+            const names = document.querySelectorAll('.comm-name');
+            const roles = document.querySelectorAll('.comm-role');
+            const phones = document.querySelectorAll('.comm-phone');
+            let members = [];
+            for(let i=0; i<names.length; i++) {
+                if(names[i].value) members.push({ name: names[i].value, role: roles[i].value, phone: phones[i].value });
+            }
             const { doc, setDoc } = window.FirestoreLib;
-            try {
-                await setDoc(doc(window.db, "portal_content", "bhola_logo"), { img: tempLogoData });
-                document.getElementById('logoSaveAction').classList.add('hidden');
-                alert("লোগো সফলভাবে ফায়ারবেসে সেভ হয়েছে! এটি এখন সব মোবাইলে দেখা যাবে।");
-            } catch(e) {
-                alert("লোগো সেভ করতে সমস্যা হয়েছে!");
-            }
+            await setDoc(doc(window.db, "portal_content", "bhola_committee"), { members });
+            alert("কমিটির তথ্য সফলভাবে সেভ হয়েছে!");
         }
 
-        // Intro Handlers
+        function renderFinance() {
+            document.getElementById('financeTotalFund').value = window.financeData.fund || 0;
+            document.getElementById('financeTotalExpense').value = window.financeData.expense || 0;
+            document.getElementById('financeNotes').value = window.financeData.notes || '';
+            let bal = (window.financeData.fund || 0) - (window.financeData.expense || 0);
+            document.getElementById('financeBalance').innerText = `৳ ${bal}`;
+        }
+
+        async function saveFinanceData() {
+            const fund = parseFloat(document.getElementById('financeTotalFund').value) || 0;
+            const expense = parseFloat(document.getElementById('financeTotalExpense').value) || 0;
+            const notes = document.getElementById('financeNotes').value;
+            const { doc, setDoc } = window.FirestoreLib;
+            await setDoc(doc(window.db, "portal_content", "bhola_finance"), { fund, expense, notes });
+            renderFinance();
+            alert("আর্থিক হিসাব সফলভাবে ফায়ারবেসে সেভ হয়েছে!");
+        }
+
+        function triggerLogoUpload() { if(isAdmin) document.getElementById('logoFileInput').click(); }
+        function handleLogoUpload(e) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                tempLogoData = evt.target.result;
+                document.getElementById('logoDisplay').src = tempLogoData;
+                if(isAdmin) document.getElementById('logoSaveAction').classList.remove('hidden');
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+        async function saveLogoToFirebase() {
+            const { doc, setDoc } = window.FirestoreLib;
+            await setDoc(doc(window.db, "portal_content", "bhola_logo"), { img: tempLogoData });
+            document.getElementById('logoSaveAction').classList.add('hidden');
+            alert("লোগো সেভ হয়েছে!");
+        }
+
         function toggleIntroEdit() {
             document.getElementById('introDisplayView').classList.add('hidden');
             document.getElementById('introEditView').classList.remove('hidden');
@@ -411,173 +508,75 @@
             document.getElementById('introDisplayView').classList.remove('hidden');
         }
         async function saveIntroToFirebase() {
+            const text = document.getElementById('inputIntroText').value;
             const { doc, setDoc } = window.FirestoreLib;
-            const text = document.getElementById('inputIntroText').value.trim();
-            try {
-                await setDoc(doc(window.db, "portal_content", "bhola_intro"), { text });
-                window.portalIntroData = text;
-                document.getElementById('displayIntroText').innerText = text;
-                cancelIntroEdit();
-                alert("ভূমিকা সফলভাবে ফায়ারবেসে সেভ হয়েছে!");
-            } catch(e) {
-                alert("সেভ করতে সমস্যা হয়েছে!");
-            }
+            await setDoc(doc(window.db, "portal_content", "bhola_intro"), { text });
+            cancelIntroEdit();
+            alert("ভূমিকা সেভ হয়েছে!");
         }
 
-        // Goals & Dynamic Sections Handlers
         function toggleGoalsEditMode() {
             document.getElementById('goalsDisplayView').classList.add('hidden');
             document.getElementById('goalsEditFormView').classList.remove('hidden');
-            
             document.getElementById('inputVision').value = window.portalGoalsData.vision || '';
             const container = document.getElementById('editObjectivesContainer');
             container.innerHTML = '';
-
             if(window.portalGoalsData.objectives) {
-                window.portalGoalsData.objectives.forEach(obj => {
-                    addObjectiveInputField(obj.category, obj.title, obj.desc);
-                });
+                window.portalGoalsData.objectives.forEach(o => addObjectiveInputField(o.category, o.title, o.desc));
             }
         }
-
         function cancelGoalsEdit() {
             document.getElementById('goalsEditFormView').classList.add('hidden');
             document.getElementById('goalsDisplayView').classList.remove('hidden');
         }
-
-        function addObjectiveInputField(cat = '', title = '', desc = '') {
-            const container = document.getElementById('editObjectivesContainer');
-            const div = document.createElement('div');
-            div.className = "p-3 bg-white border border-slate-300 rounded-xl space-y-2 relative shadow-sm";
-            div.innerHTML = `
-                <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-rose-500 text-xs font-bold hover:bg-rose-50 p-1 rounded"><i class="fa-solid fa-trash"></i></button>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pr-6">
-                    <input type="text" placeholder="খাত বা ঘর (যেমন: অবকাঠামো, শিক্ষা)" class="edit-cat p-2 text-xs border rounded-lg" value="${cat}">
-                    <input type="text" placeholder="শিরোনাম" class="edit-title p-2 text-xs border rounded-lg" value="${title}">
-                </div>
-                <textarea placeholder="বিস্তারিত বিবরণ..." class="edit-desc w-full p-2 text-xs border rounded-lg" rows="2">${desc}</textarea>
-            `;
-            container.appendChild(div);
+        function addObjectiveInputField(cat='', title='', desc='') {
+            document.getElementById('editObjectivesContainer').innerHTML += `<div class="p-3 bg-white border rounded-xl space-y-2 relative"><button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button><div class="grid grid-cols-2 gap-2 pr-6"><input type="text" placeholder="খাত" class="edit-cat p-2 text-xs border rounded" value="${cat}"><input type="text" placeholder="শিরোনাম" class="edit-title p-2 text-xs border rounded" value="${title}"></div><textarea placeholder="বিবরণ" class="edit-desc w-full p-2 text-xs border rounded" rows="2">${desc}</textarea></div>`;
         }
-
         async function saveGoalsToFirebase() {
+            const vision = document.getElementById('inputVision').value;
+            const cats = document.querySelectorAll('.edit-cat'), titles = document.querySelectorAll('.edit-title'), descs = document.querySelectorAll('.edit-desc');
+            let objectives = [];
+            for(let i=0; i<titles.length; i++) {
+                if(titles[i].value) objectives.push({ category: cats[i].value, title: titles[i].value, desc: descs[i].value });
+            }
             const { doc, setDoc } = window.FirestoreLib;
-            const vision = document.getElementById('inputVision').value.trim();
-            const cats = document.querySelectorAll('.edit-cat');
-            const titles = document.querySelectorAll('.edit-title');
-            const descs = document.querySelectorAll('.edit-desc');
-
-            let newObjectives = [];
-            for (let i = 0; i < titles.length; i++) {
-                if(titles[i].value.trim()) {
-                    newObjectives.push({
-                        category: cats[i].value.trim() || 'সাধারণ',
-                        title: titles[i].value.trim(),
-                        desc: descs[i].value.trim()
-                    });
-                }
-            }
-
-            const updatedData = { vision, objectives: newObjectives };
-
-            try {
-                await setDoc(doc(window.db, "portal_content", "bhola_goals"), updatedData);
-                window.portalGoalsData = updatedData;
-                renderGoals();
-                cancelGoalsEdit();
-                alert("লক্ষ্য, উদ্দেশ্য ও ঘরগুলো সফলভাবে ফায়ারবেসে সেভ হয়েছে!");
-            } catch (err) {
-                console.error(err);
-                alert("সেভ করতে সমস্যা হয়েছে!");
-            }
+            await setDoc(doc(window.db, "portal_content", "bhola_goals"), { vision, objectives });
+            cancelGoalsEdit();
+            alert("লক্ষ্য ও উদ্দেশ্য সেভ হয়েছে!");
         }
 
-        // Gallery Handlers
-        function handleGalleryUpload(event) {
-            const file = event.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    tempGalleryImgData = e.target.result;
-                    document.getElementById('galleryPreviewImg').src = tempGalleryImgData;
-                    document.getElementById('galleryPreviewArea').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
+        function handleGalleryUpload(e) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                tempGalleryImgData = evt.target.result;
+                document.getElementById('galleryPreviewImg').src = tempGalleryImgData;
+                document.getElementById('galleryPreviewArea').classList.remove('hidden');
+            };
+            reader.readAsDataURL(e.target.files[0]);
         }
-
         async function saveGalleryImage() {
+            const caption = document.getElementById('galleryCaptionInput').value;
             const { addDoc, collection } = window.FirestoreLib;
-            const caption = document.getElementById('galleryCaptionInput').value.trim();
-            
-            if(!tempGalleryImgData) {
-                alert("দয়া করে প্রথমে ছবি সিলেক্ট করুন।");
-                return;
-            }
-            try {
-                await addDoc(collection(window.db, "gallery"), {
-                    img: tempGalleryImgData,
-                    caption: caption || 'উন্নয়ন কার্যক্রম',
-                    date: new Date().toLocaleDateString('bn-BD'),
-                    timestamp: Date.now()
-                });
-
-                tempGalleryImgData = "";
-                document.getElementById('galleryCaptionInput').value = '';
-                document.getElementById('galleryPreviewImg').src = '';
-                document.getElementById('galleryPreviewArea').classList.add('hidden');
-                document.getElementById('galleryFileInput').value = '';
-                alert('ছবি সফলভাবে গ্যালারিতে সেভ হয়েছে!');
-            } catch (err) {
-                console.error(err);
-                alert("ছবি সেভ করতে সমস্যা হয়েছে!");
-            }
+            await addDoc(collection(window.db, "gallery"), { img: tempGalleryImgData, caption: caption || 'কার্যক্রম', date: new Date().toLocaleDateString('bn-BD') });
+            document.getElementById('galleryPreviewArea').classList.add('hidden');
+            alert("ছবি গ্যালারিতে সেভ হয়েছে!");
         }
-
         async function deleteGalleryImage(id) {
             const { deleteDoc, doc } = window.FirestoreLib;
-            if(confirm("আপনি কি এই ছবিটি মুছে ফেলতে চান?")) {
-                await deleteDoc(doc(window.db, "gallery", id));
-            }
+            if(confirm("মুছে ফেলতে চান?")) await deleteDoc(doc(window.db, "gallery", id));
         }
-
         function renderGallery() {
-            const grid = document.getElementById('galleryGrid');
-            const emptyState = document.getElementById('galleryEmpty');
-            const countBadge = document.getElementById('galleryCountBadge');
-            
+            const grid = document.getElementById('galleryGrid'), empty = document.getElementById('galleryEmpty');
             grid.innerHTML = '';
-            countBadge.innerText = `${window.galleryImages.length} ছবি`;
-
-            if(window.galleryImages.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            } else {
-                emptyState.classList.add('hidden');
-            }
-
+            document.getElementById('galleryCountBadge').innerText = `${window.galleryImages.length} ছবি`;
+            if(window.galleryImages.length === 0) { empty.classList.remove('hidden'); return; }
+            empty.classList.add('hidden');
             window.galleryImages.forEach(item => {
-                const div = document.createElement('div');
-                div.className = "gallery-item shadow-sm";
-                div.innerHTML = `
-                    ${isAdmin ? `<div class="gallery-delete" onclick="deleteGalleryImage('${item.id}')"><i class="fa-solid fa-trash-can"></i></div>` : ''}
-                    <img src="${item.img}" alt="${item.caption}" class="gallery-img cursor-pointer" onclick="openLightbox('${item.img}', '${item.caption}')">
-                    <div class="gallery-overlay pointer-events-none">
-                        <p class="gallery-caption">${item.caption}</p>
-                        <p class="gallery-date"><i class="fa-regular fa-calendar mr-1"></i>${item.date}</p>
-                    </div>
-                `;
-                grid.appendChild(div);
+                grid.innerHTML += `<div class="gallery-item shadow-sm">${isAdmin ? `<div class="gallery-delete" onclick="deleteGalleryImage('${item.id}')"><i class="fa-solid fa-trash"></i></div>` : ''}<img src="${item.img}" class="gallery-img cursor-pointer" onclick="openLightbox('${item.img}')"><div class="gallery-overlay pointer-events-none"><p class="gallery-caption">${item.caption}</p><p class="gallery-date">${item.date}</p></div></div>`;
             });
         }
-
-        function openLightbox(imgSrc, captionText) {
-            document.getElementById('lightboxImg').src = imgSrc;
-            document.getElementById('lightboxCaption').innerText = captionText;
-            document.getElementById('lightbox').classList.add('active');
-        }
-        function closeLightbox(e) { document.getElementById('lightbox').classList.remove('active'); }
-        function closeLightboxDirect() { document.getElementById('lightbox').classList.remove('active'); }
+        function openLightbox(src) { document.getElementById('lightboxImg').src = src; document.getElementById('lightbox').classList.add('active'); }
+        function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
     </script>
 </body>
 </html>
