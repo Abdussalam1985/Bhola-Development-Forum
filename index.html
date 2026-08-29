@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase App & Firestore SDKs -->
+    <!-- Firebase App & Firestore SDKs (Fully Configured) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -40,6 +40,11 @@
         @media (min-width: 640px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 1024px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (min-width: 1280px) { .gallery-grid { grid-template-columns: repeat(4, 1fr); } }
+        
+        .committee-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1.25rem; }
+        @media (min-width: 640px) { .committee-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .committee-grid { grid-template-columns: repeat(3, 1fr); } }
+
         .gallery-item { position: relative; overflow: hidden; border-radius: 1rem; background: #f8fafc; transition: all 0.3s ease; }
         .gallery-item:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); }
         .gallery-img { width: 100%; height: 220px; object-fit: cover; display: block; transition: transform 0.5s ease; }
@@ -91,7 +96,7 @@
             </div>
             
             <div class="flex flex-wrap items-center justify-center gap-2.5">
-                <!-- Color Theme Switcher (Knobs) -->
+                <!-- Color Theme Switcher -->
                 <div class="flex items-center gap-1.5 bg-black/20 p-1.5 rounded-xl border border-white/10">
                     <button onclick="setThemeColor('blue')" title="Blue Theme" class="w-5 h-5 rounded-full bg-blue-700 hover:scale-110 transition border border-white"></button>
                     <button onclick="setThemeColor('emerald')" title="Emerald Theme" class="w-5 h-5 rounded-full bg-emerald-700 hover:scale-110 transition border border-white"></button>
@@ -182,6 +187,45 @@
                 <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-wallet"></i></div>
             </div>
         </div>
+
+        <!-- Committee Members Management Section -->
+        <section id="committeeSection" class="bg-white border border-slate-200 dynamic-card p-6 rounded-2xl shadow-sm space-y-5 fade-in">
+            <div class="flex justify-between items-center flex-wrap gap-3">
+                <h3 class="font-bold text-sm md:text-base flex items-center gap-2">
+                    <i class="fa-solid fa-users text-blue-600"></i> <span data-translate="committeeTitle">কার্যনির্বাহী কমিটি ও সদস্যবৃন্দ</span>
+                </h3>
+                <span id="committeeCountBadge" class="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-semibold">0 সদস্য</span>
+            </div>
+
+            <!-- Admin Committee Add Panel -->
+            <div id="committeeUploadPanel" class="hidden bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 space-y-3">
+                <h4 class="font-bold text-xs text-blue-600" data-translate="addCommitteeTitle">নতুন সদস্য যোগ করুন</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">সদস্যের ছবি</label>
+                        <input type="file" id="memberImgInput" accept="image/*" class="w-full text-xs p-1.5 border border-slate-200 rounded-xl bg-white dark:bg-slate-900" onchange="handleMemberImgUpload(event)">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">নাম</label>
+                        <input type="text" id="memberNameInput" placeholder="সদস্যের নাম..." class="w-full p-2 rounded-xl border border-slate-200 text-xs bg-white dark:bg-slate-900 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">পদবি</label>
+                        <input type="text" id="memberRoleInput" placeholder="যেমন: সহ-সভাপতি..." class="w-full p-2 rounded-xl border border-slate-200 text-xs bg-white dark:bg-slate-900 outline-none">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="saveCommitteeMember()" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-xl text-xs hover:bg-blue-700 shadow transition">তালিকাভুক্ত করুন</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Committee Grid -->
+            <div id="committeeGrid" class="committee-grid"></div>
+            <div id="committeeEmpty" class="text-center py-8">
+                <i class="fa-regular fa-user-circle text-4xl text-slate-200 mb-2"></i>
+                <p class="text-sm text-slate-400" data-translate="committeeEmptyText">এখনো কোনো সদস্যের তালিকা যোগ করা হয়নি।</p>
+            </div>
+        </section>
 
         <!-- Admin Transaction Form Section -->
         <section id="transactionFormSection" class="hidden bg-white border border-slate-200 dynamic-card p-6 rounded-2xl shadow-sm space-y-4 fade-in">
@@ -306,6 +350,9 @@
                 totalIncomeCard: "মোট আয়",
                 totalExpenseCard: "মোট ব্যয়",
                 balanceCard: "বর্তমান স্থিতি",
+                committeeTitle: "কার্যনির্বাহী কমিটি ও সদস্যবৃন্দ",
+                committeeEmptyText: "এখনো কোনো সদস্যের তালিকা যোগ করা হয়নি।",
+                addCommitteeTitle: "নতুন সদস্য যোগ করুন",
                 addNewTransTitle: "নতুন আয় / ব্যয় যোগ করুন (অ্যাডমিন প্যানেল)",
                 dateLabel: "তারিখ",
                 descLabel: "বিবরণ",
@@ -346,6 +393,9 @@
                 totalIncomeCard: "Total Income",
                 totalExpenseCard: "Total Expense",
                 balanceCard: "Current Balance",
+                committeeTitle: "Executive Committee & Members",
+                committeeEmptyText: "No committee members added yet.",
+                addCommitteeTitle: "Add New Member",
                 addNewTransTitle: "Add New Income / Expense (Admin Panel)",
                 dateLabel: "Date",
                 descLabel: "Description",
@@ -380,6 +430,7 @@
                 if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
             });
             renderGallery();
+            renderCommittee();
         }
 
         function updateLiveClock() {
@@ -431,7 +482,7 @@
                     c.classList.add('bg-slate-900', 'border-slate-800');
                 });
                 modeIcon.className = "fa-solid fa-sun text-amber-400";
-                modeText.innerText = currentLang === 'bn' ? "Light Mode" : "Light Mode";
+                modeText.innerText = "Light Mode";
             } else {
                 body.className = "bg-slate-100 text-slate-800 transition-colors duration-300";
                 cards.forEach(c => {
@@ -439,11 +490,11 @@
                     c.classList.add('bg-white', 'border-slate-200');
                 });
                 modeIcon.className = "fa-solid fa-moon";
-                modeText.innerText = currentLang === 'bn' ? "Dark Mode" : "Dark Mode";
+                modeText.innerText = "Dark Mode";
             }
         }
 
-        // Admin Login & Logout Handler
+        // Admin Login & Logout Handler with Firebase Password Verification
         async function toggleAdminMode() {
             const { doc, getDoc } = window.FirestoreLib;
             let currentPassword = "2026";
@@ -463,6 +514,7 @@
                     document.getElementById('noticeEditContainer').classList.remove('hidden');
                     document.getElementById('noticeEditContainer').classList.add('flex');
                     document.getElementById('galleryUploadPanel').classList.remove('hidden');
+                    document.getElementById('committeeUploadPanel').classList.remove('hidden');
                     loadAllDataFromFirebase();
                 } else if(pass !== null) {
                     alert("ভুল পাসওয়ার্ড!");
@@ -476,6 +528,7 @@
                 document.getElementById('noticeEditContainer').classList.remove('flex');
                 document.getElementById('noticeEditContainer').classList.add('hidden');
                 document.getElementById('galleryUploadPanel').classList.add('hidden');
+                document.getElementById('committeeUploadPanel').classList.add('hidden');
                 loadAllDataFromFirebase();
             }
         }
@@ -504,6 +557,7 @@
             const { collection, doc, onSnapshot } = window.FirestoreLib;
             const db = window.db;
 
+            // Notice Sync
             onSnapshot(doc(db, "settings", "notice"), (docSnap) => {
                 if (docSnap.exists()) {
                     const noticeText = docSnap.data().text;
@@ -512,18 +566,32 @@
                 }
             });
 
+            // Transactions Sync
             onSnapshot(collection(db, "transactions"), (snapshot) => {
                 let transactions = [];
                 snapshot.forEach(doc => { transactions.push({ id: doc.id, ...doc.data() }); });
                 renderLedger(transactions);
             });
 
+            // Gallery Sync
             onSnapshot(collection(db, "gallery"), (snapshot) => {
                 window.galleryImages = [];
                 snapshot.forEach(doc => { window.galleryImages.push({ id: doc.id, ...doc.data() }); });
                 window.galleryImages.sort((a,b) => b.timestamp - a.timestamp);
                 renderGallery();
             });
+
+            // Committee Members Sync
+            onSnapshot(collection(db, "committee"), (snapshot) => {
+                window.committeeMembers = [];
+                snapshot.forEach(doc => { window.committeeMembers.push({ id: doc.id, ...doc.data() }); });
+                window.committeeMembers.sort((a,b) => a.timestamp - b.timestamp);
+                renderCommittee();
+            });
+
+            // Last Updated Time Stamp Update
+            const nowStr = new Date().toLocaleString('bn-BD');
+            document.getElementById('lastUpdateDisplay').innerText = nowStr;
         }
 
         async function updateNoticeText() {
@@ -588,6 +656,80 @@
             const netDisp = document.getElementById('netBalanceDisp');
             netDisp.innerText = '৳ ' + net.toLocaleString();
             netDisp.className = `text-2xl md:text-3xl font-black mt-1 ${net >= 0 ? 'text-blue-600' : 'text-rose-600'}`;
+        }
+
+        // Committee Management System
+        let tempMemberImg = "https://via.placeholder.com/150";
+        window.committeeMembers = [];
+
+        function handleMemberImgUpload(event) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) { tempMemberImg = e.target.result; };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function saveCommitteeMember() {
+            const { addDoc, collection } = window.FirestoreLib;
+            const name = document.getElementById('memberNameInput').value.trim();
+            const role = document.getElementById('memberRoleInput').value.trim();
+
+            if(!name || !role) {
+                alert("দয়া করে সদস্যের নাম এবং পদবি লিখুন।");
+                return;
+            }
+
+            await addDoc(collection(window.db, "committee"), {
+                name,
+                role,
+                img: tempMemberImg,
+                timestamp: Date.now()
+            });
+
+            document.getElementById('memberNameInput').value = '';
+            document.getElementById('memberRoleInput').value = '';
+            document.getElementById('memberImgInput').value = '';
+            tempMemberImg = "https://via.placeholder.com/150";
+            alert("সদস্য সফলভাবে তালিকাভুক্ত হয়েছে!");
+        }
+
+        async function deleteCommitteeMember(id) {
+            const { deleteDoc, doc } = window.FirestoreLib;
+            if(confirm("আপনি কি এই সদস্যকে তালিকা থেকে বাদ দিতে চান?")) {
+                await deleteDoc(doc(window.db, "committee", id));
+            }
+        }
+
+        function renderCommittee() {
+            const grid = document.getElementById('committeeGrid');
+            const emptyState = document.getElementById('committeeEmpty');
+            const countBadge = document.getElementById('committeeCountBadge');
+
+            grid.innerHTML = '';
+            countBadge.innerText = `${window.committeeMembers.length} সদস্য`;
+
+            if(window.committeeMembers.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            window.committeeMembers.forEach(m => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl flex items-center gap-4 relative shadow-sm";
+                card.innerHTML = `
+                    ${isAdmin ? `<button onclick="deleteCommitteeMember('${m.id}')" class="absolute top-3 right-3 text-rose-500 hover:text-rose-700 bg-white dark:bg-slate-900 w-7 h-7 rounded-full flex items-center justify-center shadow"><i class="fa-solid fa-trash-can text-xs"></i></button>` : ''}
+                    <img src="${m.img}" alt="${m.name}" class="w-16 h-16 rounded-2xl object-cover border-2 border-amber-400 shadow">
+                    <div>
+                        <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">${m.name}</h4>
+                        <p class="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-0.5">${m.role}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
         }
 
         // Gallery Management with Firebase
