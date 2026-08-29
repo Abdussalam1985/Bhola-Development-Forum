@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase App, Firestore & Analytics SDKs -->
+    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -36,13 +36,7 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
-        
-        body { 
-            font-family: 'Kalpurush', 'SolaimanLipi', 'Nikosh', 'Hind Siliguri', Arial, sans-serif; 
-            text-rendering: optimizeLegibility;
-            -webkit-font-smoothing: antialiased;
-        }
-
+        body { font-family: 'Kalpurush', 'SolaimanLipi', 'Nikosh', 'Hind Siliguri', Arial, sans-serif; text-rendering: optimizeLegibility; }
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .gallery-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1rem; }
@@ -50,10 +44,6 @@
         @media (min-width: 1024px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (min-width: 1280px) { .gallery-grid { grid-template-columns: repeat(4, 1fr); } }
         
-        .committee-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1.25rem; }
-        @media (min-width: 640px) { .committee-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 1024px) { .committee-grid { grid-template-columns: repeat(3, 1fr); } }
-
         .gallery-item { position: relative; overflow: hidden; border-radius: 1rem; background: #f8fafc; transition: all 0.3s ease; }
         .gallery-item:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         .gallery-img { width: 100%; height: 220px; object-fit: cover; display: block; transition: transform 0.5s ease; }
@@ -69,11 +59,8 @@
         .lightbox.active { display: flex; opacity: 1; }
         .lightbox-img { max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: 0.5rem; }
         .lightbox-close { position: absolute; top: 1rem; right: 1rem; color: white; font-size: 1.5rem; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.1); }
-        .upload-zone { border: 2px dashed #cbd5e1; border-radius: 1rem; padding: 2rem; text-align: center; transition: all 0.3s; cursor: pointer; }
+        .upload-zone { border: 2px dashed #cbd5e1; border-radius: 1rem; padding: 1.5rem; text-align: center; transition: all 0.3s; cursor: pointer; background: #fafafa; }
         .upload-zone:hover { border-color: #3b82f6; background: #eff6ff; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
     </style>
 </head>
 <body id="mainBody" class="bg-slate-100 text-slate-900 transition-colors duration-300">
@@ -91,17 +78,24 @@
             <div class="flex items-center gap-4 text-center md:text-left">
                 <div class="relative group cursor-pointer" onclick="triggerLogoUpload()">
                     <img id="logoDisplay" src="https://via.placeholder.com/192" alt="Logo" class="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border-2 border-amber-400 shadow-md bg-white">
-                    <div class="absolute inset-0 bg-black/60 rounded-2xl flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition text-[11px] text-white font-medium">
+                    <div id="logoOverlayTip" class="absolute inset-0 bg-black/60 rounded-2xl flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition text-[11px] text-white font-medium">
                         <i class="fa-solid fa-camera mb-0.5"></i>
-                        <span>পরিবর্তন</span>
+                        <span>লোগো বদলান</span>
                     </div>
                 </div>
                 <input type="file" id="logoFileInput" class="hidden" accept="image/*" onchange="handleLogoUpload(event)">
+                
                 <div>
                     <h1 class="text-xl md:text-3xl font-bold tracking-wide">ভোলা জেলা উন্নয়ন কর্তৃপক্ষ</h1>
                     <p class="text-xs md:text-sm text-blue-100 mt-1 font-medium">
                         <span>আধুনিক ও টেকসই জেলা গড়ার প্রত্যয়</span>
                     </p>
+                    <!-- Admin Only Logo Save Button -->
+                    <div id="logoSaveAction" class="hidden mt-2">
+                        <button onclick="saveLogoToFirebase()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold px-3 py-1 rounded-lg shadow transition flex items-center gap-1">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> লোগো সেভ করুন
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -120,18 +114,39 @@
     <!-- Main Container -->
     <main class="max-w-6xl mx-auto px-4 py-6 space-y-8">
 
-        <!-- Vision, Mission & Objectives Section (Dynamic Editable) -->
+        <!-- Introduction & Overview Section -->
+        <section class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-4 fade-in">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h2 class="text-base md:text-lg font-bold text-blue-900 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-amber-500"></i> ভূমিকা ও পরিচিতি
+                </h2>
+                <button id="editIntroBtn" onclick="toggleIntroEdit()" class="hidden bg-slate-200 text-slate-800 text-xs px-3 py-1 rounded-lg font-semibold">এডিট</button>
+            </div>
+            <div id="introDisplayView">
+                <p id="displayIntroText" class="text-sm text-slate-700 leading-relaxed">ভোলা জেলা উন্নয়ন কর্তৃপক্ষ একটি সেবামূলক ও প্রশাসনিক উন্নয়নমূলক প্ল্যাটফর্ম। জেলার সামগ্রিক অবকাঠামো, শিক্ষা, স্বাস্থ্য ও জীবনমান উন্নয়নের লক্ষ্যে এই পোর্টালে বিভিন্ন কার্যক্রম পরিচালিত হয়।</p>
+            </div>
+            <div id="introEditView" class="hidden space-y-3">
+                <textarea id="inputIntroText" class="w-full p-3 border rounded-xl text-xs" rows="3"></textarea>
+                <div class="flex justify-end gap-2">
+                    <button onclick="cancelIntroEdit()" class="px-3 py-1.5 bg-gray-200 text-xs rounded-lg">বাতিল</button>
+                    <button onclick="saveIntroToFirebase()" class="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-floppy-disk"></i> ভূমিকা সেভ করুন
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vision, Mission & Dynamic Sections Management -->
         <section class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-6 fade-in">
             <div class="flex justify-between items-center flex-wrap gap-3 border-b pb-4">
                 <div>
                     <h2 class="text-lg md:text-xl font-bold text-blue-900 flex items-center gap-2">
-                        <i class="fa-solid fa-bullseye text-amber-500"></i> আমাদের লক্ষ্য, উদ্দেশ্য ও দৃষ্টিভঙ্গি
+                        <i class="fa-solid fa-bullseye text-amber-500"></i> লক্ষ্য, উদ্দেশ্য ও বিভিন্ন বিভাগীয় কার্যক্রম
                     </h2>
-                    <p class="text-xs text-slate-500 mt-1">ভোলা জেলা উন্নয়ন কর্তৃপক্ষের মূলনীতি ও কর্মপরিকল্পনা</p>
+                    <p class="text-xs text-slate-500 mt-1">দৃষ্টিভঙ্গি এবং বিভিন্ন খাতভিত্তিক (যেমন: অবকাঠামো, শিক্ষা ইত্যাদি) লক্ষ্যসমূহ</p>
                 </div>
-                <!-- Admin Edit Toggle Button -->
-                <button id="editGoalsBtn" onclick="toggleGoalsEditMode()" class="hidden bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-blue-700 shadow transition">
-                    <i class="fa-solid fa-pen-to-square mr-1"></i> এডিট করুন
+                <button id="editGoalsBtn" onclick="toggleGoalsEditMode()" class="hidden bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-blue-700 shadow transition">
+                    <i class="fa-solid fa-pen-to-square mr-1"></i> সেকশনগুলো এডিট ও নতুন যোগ করুন
                 </button>
             </div>
 
@@ -143,35 +158,37 @@
                 </div>
 
                 <div>
-                    <h4 class="font-bold text-slate-800 text-sm mb-3">মূল লক্ষ্য ও উদ্দেশ্যসমূহ:</h4>
+                    <h4 class="font-bold text-slate-800 text-sm mb-3">খাতভিত্তিক লক্ষ্য ও উদ্দেশ্যসমূহ (যেমন: অবকাঠামো, শিক্ষা, ইত্যাদি):</h4>
                     <div id="displayObjectivesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Dynamic Objectives will load here -->
+                        <!-- Dynamic Cards will load here -->
                     </div>
                 </div>
             </div>
 
-            <!-- Admin Edit Form (Hidden by default) -->
-            <div id="goalsEditFormView" class="hidden space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <h4 class="font-bold text-xs text-blue-600 uppercase">লক্ষ্য ও উদ্দেশ্য আপডেট ফর্ম (অ্যাডমিন)</h4>
+            <!-- Admin Edit Form -->
+            <div id="goalsEditFormView" class="hidden space-y-4 bg-slate-50 p-5 rounded-xl border border-slate-200">
+                <h4 class="font-bold text-xs text-blue-600 uppercase tracking-wide">অ্যাডমিন প্যানেল: ভিশন ও খাতভিত্তিক ঘর (Sections) ম্যানেজমেন্ট</h4>
                 
                 <div>
                     <label class="block text-xs font-bold text-slate-600 mb-1">ভিশন (Vision):</label>
                     <textarea id="inputVision" class="w-full p-2.5 rounded-xl border border-slate-300 text-xs bg-white outline-none" rows="2"></textarea>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">উদ্দেশ্যসমূহ (Objectives List):</label>
-                    <div id="editObjectivesContainer" class="space-y-3">
-                        <!-- Dynamic items for editing -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="block text-xs font-bold text-slate-600">খাত ও বিভাগসমূহ (Infrastructure, Education, etc.):</label>
+                        <button type="button" onclick="addObjectiveInputField()" class="bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-emerald-700">
+                            <i class="fa-solid fa-plus mr-1"></i> নতুন ঘর/খাত যোগ করুন
+                        </button>
                     </div>
-                    <button type="button" onclick="addObjectiveInputField()" class="mt-2 bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-emerald-700">
-                        <i class="fa-solid fa-plus mr-1"></i> নতুন উদ্দেশ্য যোগ করুন
-                    </button>
+                    <div id="editObjectivesContainer" class="space-y-3"></div>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-3 border-t">
                     <button onclick="cancelGoalsEdit()" class="bg-slate-300 text-slate-800 text-xs font-bold px-4 py-2 rounded-xl">বাতিল</button>
-                    <button onclick="saveGoalsToFirebase()" class="bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-blue-700 shadow">পরিবর্তন সেভ করুন</button>
+                    <button onclick="saveGoalsToFirebase()" class="bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-blue-700 shadow flex items-center gap-1">
+                        <i class="fa-solid fa-floppy-disk"></i> পরিবর্তনগুলো সেভ করুন
+                    </button>
                 </div>
             </div>
         </section>
@@ -185,26 +202,31 @@
                 <span id="galleryCountBadge" class="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-semibold">0 ছবি</span>
             </div>
 
-            <!-- Admin Upload Panel -->
-            <div id="galleryUploadPanel" class="hidden space-y-3">
+            <!-- Admin Upload Panel with Explicit Save Button -->
+            <div id="galleryUploadPanel" class="hidden space-y-4 bg-slate-50 p-4 rounded-xl border">
                 <div class="upload-zone" onclick="document.getElementById('galleryFileInput').click()">
                     <input type="file" id="galleryFileInput" class="hidden" accept="image/*" onchange="handleGalleryUpload(event)">
-                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-300 mb-2"></i>
-                    <p class="text-sm font-medium text-slate-600">ছবি আপলোড করতে ক্লিক করুন</p>
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-500 mb-1"></i>
+                    <p class="text-xs font-bold text-slate-700">ছবি পরিবর্তন বা নির্বাচন করতে এখানে ক্লিক করুন</p>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div class="sm:col-span-2">
-                        <label class="block text-xs text-slate-500 mb-1">ছবির বিবরণ / ক্যাপশন</label>
-                        <input type="text" id="galleryCaptionInput" placeholder="যেমন: উন্নয়ন সভা ২০২৬..." class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-transparent outline-none font-medium">
-                    </div>
-                    <div class="flex items-end">
-                        <button onclick="saveGalleryImage()" class="w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs hover:bg-blue-700 shadow transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-floppy-disk"></i> গ্যালারিতে সেভ করুন
-                        </button>
+
+                <div id="galleryPreviewArea" class="hidden flex items-center gap-4 bg-white p-3 rounded-xl border">
+                    <img id="galleryPreviewImg" src="" class="w-20 h-20 rounded-lg object-cover border">
+                    <div class="flex-1">
+                        <p class="text-xs font-semibold text-emerald-600 mb-1"><i class="fa-solid fa-check-circle"></i> ছবি সিলেক্ট হয়েছে</p>
+                        <p class="text-[11px] text-slate-500">নিচে ক্যাপশন লিখে 'গ্যালারিতে সেভ করুন' বাটনে চাপ দিন।</p>
                     </div>
                 </div>
-                <div id="galleryPreviewArea" class="hidden mt-2">
-                    <img id="galleryPreviewImg" src="" class="h-32 rounded-xl border border-slate-200 object-cover">
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">ছবির বিবরণ / ক্যাপশন</label>
+                    <input type="text" id="galleryCaptionInput" placeholder="যেমন: ভোলা উন্নয়ন সভা ২০২৬..." class="w-full p-2.5 rounded-xl border border-slate-300 text-xs bg-white outline-none">
+                </div>
+
+                <div class="flex justify-end">
+                    <button onclick="saveGalleryImage()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk text-sm"></i> গ্যালারিতে ছবি সেভ করুন
+                    </button>
                 </div>
             </div>
 
@@ -212,7 +234,7 @@
             <div id="galleryGrid" class="gallery-grid"></div>
             <div id="galleryEmpty" class="text-center py-10">
                 <i class="fa-regular fa-images text-4xl text-slate-300 mb-3"></i>
-                <p class="text-sm text-slate-500">এখনো কোনো ছবি যোগ করা হয়নি।</p>
+                <p class="text-sm text-slate-500">এখনো কোনো ছবি যোগ করা হয়নি।</p>
             </div>
         </section>
 
@@ -228,7 +250,9 @@
         let isAdmin = false;
         let isDarkMode = false;
         let tempGalleryImgData = "";
+        let tempLogoData = "";
         window.galleryImages = [];
+        window.portalIntroData = "ভোলা জেলা উন্নয়ন কর্তৃপক্ষ একটি সেবামূলক ও প্রশাসনিক উন্নয়নমূলক প্ল্যাটফর্ম। জেলার সামগ্রিক অবকাঠামো, শিক্ষা, স্বাস্থ্য ও জীবনমান উন্নয়নের লক্ষ্যে এই পোর্টালে বিভিন্ন কার্যক্রম পরিচালিত হয়।";
         window.portalGoalsData = {
             vision: "ভোলা জেলার টেকসই উন্নয়ন, আধুনিক প্রযুক্তিভিত্তিক সেবা এবং একটি জ্ঞানভিত্তিক ও স্বাবলম্বী জনপদ গড়ে তোলা।",
             objectives: [
@@ -260,9 +284,11 @@
                     isAdmin = true;
                     document.getElementById('authBtn').innerHTML = `<i class="fa-solid fa-lock-open"></i> লগআউট`;
                     document.getElementById('editGoalsBtn').classList.remove('hidden');
+                    document.getElementById('editIntroBtn').classList.remove('hidden');
                     document.getElementById('galleryUploadPanel').classList.remove('hidden');
+                    if(tempLogoData) document.getElementById('logoSaveAction').classList.remove('hidden');
                     renderGallery();
-                    alert("অ্যাডমিন মোড সক্রিয় হয়েছে!");
+                    alert("অ্যাডমিন মোড সফলভাবে সক্রিয় হয়েছে! এখন যেকোনো পরিবর্তন সেভ করতে পারবেন।");
                 } else if(pass !== null) {
                     alert("ভুল পাসওয়ার্ড!");
                 }
@@ -270,19 +296,30 @@
                 isAdmin = false;
                 document.getElementById('authBtn').innerHTML = `<i class="fa-solid fa-lock"></i> অ্যাডমিন লগইন`;
                 document.getElementById('editGoalsBtn').classList.add('hidden');
+                document.getElementById('editIntroBtn').classList.add('hidden');
                 document.getElementById('galleryUploadPanel').classList.add('hidden');
+                document.getElementById('logoSaveAction').classList.add('hidden');
                 document.getElementById('goalsEditFormView').classList.add('hidden');
                 document.getElementById('goalsDisplayView').classList.remove('hidden');
+                document.getElementById('introEditView').classList.add('hidden');
+                document.getElementById('introDisplayView').classList.remove('hidden');
                 renderGallery();
             }
         }
 
-        // Firebase Sync Listener
+        // Firebase Sync Listener (Real-time Universal Update for ALL Devices)
         document.addEventListener('firebase-ready', () => {
             const { doc, collection, onSnapshot } = window.FirestoreLib;
             const db = window.db;
 
-            // Load Vision & Objectives from Firebase
+            // 1. Load Logo Universal Sync
+            onSnapshot(doc(db, "portal_content", "bhola_logo"), (docSnap) => {
+                if (docSnap.exists() && docSnap.data().img) {
+                    document.getElementById('logoDisplay').src = docSnap.data().img;
+                }
+            });
+
+            // 2. Load Vision & Dynamic Objectives Universal Sync
             onSnapshot(doc(db, "portal_content", "bhola_goals"), (docSnap) => {
                 if (docSnap.exists()) {
                     window.portalGoalsData = docSnap.data();
@@ -290,7 +327,15 @@
                 renderGoals();
             });
 
-            // Load Gallery Images from Firebase
+            // 3. Load Intro Text Universal Sync
+            onSnapshot(doc(db, "portal_content", "bhola_intro"), (docSnap) => {
+                if (docSnap.exists()) {
+                    window.portalIntroData = docSnap.data().text || window.portalIntroData;
+                    document.getElementById('displayIntroText').innerText = window.portalIntroData;
+                }
+            });
+
+            // 4. Load Gallery Images Universal Sync
             onSnapshot(collection(db, "gallery"), (snapshot) => {
                 window.galleryImages = [];
                 snapshot.forEach(docSnap => { 
@@ -302,11 +347,11 @@
         });
 
         function renderGoals() {
-            document.getElementById('displayVisionText').innerText = window.portalGoalsData.vision;
+            document.getElementById('displayVisionText').innerText = window.portalGoalsData.vision || '';
             const grid = document.getElementById('displayObjectivesGrid');
             grid.innerHTML = '';
             
-            if(window.portalGoalsData.objectives) {
+            if(window.portalGoalsData.objectives && window.portalGoalsData.objectives.length > 0) {
                 window.portalGoalsData.objectives.forEach(obj => {
                     const card = document.createElement('div');
                     card.className = "bg-slate-50 border border-slate-200 p-4 rounded-xl shadow-sm";
@@ -317,20 +362,82 @@
                     `;
                     grid.appendChild(card);
                 });
+            } else {
+                grid.innerHTML = `<p class="text-xs text-slate-400 italic">কোনো বিভাগ বা ঘর যোগ করা হয়নি।</p>`;
             }
         }
 
+        // Logo Upload & Save Handlers
+        function triggerLogoUpload() { 
+            if(isAdmin) document.getElementById('logoFileInput').click(); 
+            else alert("লোগো পরিবর্তন করতে প্রথমে অ্যাডমিন লগইন করুন।");
+        }
+        
+        function handleLogoUpload(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    tempLogoData = evt.target.result;
+                    document.getElementById('logoDisplay').src = tempLogoData;
+                    if(isAdmin) {
+                        document.getElementById('logoSaveAction').classList.remove('hidden');
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function saveLogoToFirebase() {
+            if(!tempLogoData) return;
+            const { doc, setDoc } = window.FirestoreLib;
+            try {
+                await setDoc(doc(window.db, "portal_content", "bhola_logo"), { img: tempLogoData });
+                document.getElementById('logoSaveAction').classList.add('hidden');
+                alert("লোগো সফলভাবে ফায়ারবেসে সেভ হয়েছে! এটি এখন সব মোবাইলে দেখা যাবে।");
+            } catch(e) {
+                alert("লোগো সেভ করতে সমস্যা হয়েছে!");
+            }
+        }
+
+        // Intro Handlers
+        function toggleIntroEdit() {
+            document.getElementById('introDisplayView').classList.add('hidden');
+            document.getElementById('introEditView').classList.remove('hidden');
+            document.getElementById('inputIntroText').value = window.portalIntroData;
+        }
+        function cancelIntroEdit() {
+            document.getElementById('introEditView').classList.add('hidden');
+            document.getElementById('introDisplayView').classList.remove('hidden');
+        }
+        async function saveIntroToFirebase() {
+            const { doc, setDoc } = window.FirestoreLib;
+            const text = document.getElementById('inputIntroText').value.trim();
+            try {
+                await setDoc(doc(window.db, "portal_content", "bhola_intro"), { text });
+                window.portalIntroData = text;
+                document.getElementById('displayIntroText').innerText = text;
+                cancelIntroEdit();
+                alert("ভূমিকা সফলভাবে ফায়ারবেসে সেভ হয়েছে!");
+            } catch(e) {
+                alert("সেভ করতে সমস্যা হয়েছে!");
+            }
+        }
+
+        // Goals & Dynamic Sections Handlers
         function toggleGoalsEditMode() {
             document.getElementById('goalsDisplayView').classList.add('hidden');
             document.getElementById('goalsEditFormView').classList.remove('hidden');
             
-            document.getElementById('inputVision').value = window.portalGoalsData.vision;
+            document.getElementById('inputVision').value = window.portalGoalsData.vision || '';
             const container = document.getElementById('editObjectivesContainer');
             container.innerHTML = '';
 
-            window.portalGoalsData.objectives.forEach((obj, idx) => {
-                appendObjectiveRow(obj.category, obj.title, obj.desc);
-            });
+            if(window.portalGoalsData.objectives) {
+                window.portalGoalsData.objectives.forEach(obj => {
+                    addObjectiveInputField(obj.category, obj.title, obj.desc);
+                });
+            }
         }
 
         function cancelGoalsEdit() {
@@ -341,14 +448,14 @@
         function addObjectiveInputField(cat = '', title = '', desc = '') {
             const container = document.getElementById('editObjectivesContainer');
             const div = document.createElement('div');
-            div.className = "p-3 bg-white border border-slate-300 rounded-xl space-y-2 relative";
+            div.className = "p-3 bg-white border border-slate-300 rounded-xl space-y-2 relative shadow-sm";
             div.innerHTML = `
-                <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-rose-500 text-xs font-bold"><i class="fa-solid fa-trash"></i></button>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <input type="text" placeholder="খাত (যেমন: শিক্ষা)" class="edit-cat p-2 text-xs border rounded-lg" value="${cat}">
+                <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-rose-500 text-xs font-bold hover:bg-rose-50 p-1 rounded"><i class="fa-solid fa-trash"></i></button>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pr-6">
+                    <input type="text" placeholder="খাত বা ঘর (যেমন: অবকাঠামো, শিক্ষা)" class="edit-cat p-2 text-xs border rounded-lg" value="${cat}">
                     <input type="text" placeholder="শিরোনাম" class="edit-title p-2 text-xs border rounded-lg" value="${title}">
                 </div>
-                <textarea placeholder="বিবরণ..." class="edit-desc w-full p-2 text-xs border rounded-lg" rows="2">${desc}</textarea>
+                <textarea placeholder="বিস্তারিত বিবরণ..." class="edit-desc w-full p-2 text-xs border rounded-lg" rows="2">${desc}</textarea>
             `;
             container.appendChild(div);
         }
@@ -364,7 +471,7 @@
             for (let i = 0; i < titles.length; i++) {
                 if(titles[i].value.trim()) {
                     newObjectives.push({
-                        category: cats[i].value.trim(),
+                        category: cats[i].value.trim() || 'সাধারণ',
                         title: titles[i].value.trim(),
                         desc: descs[i].value.trim()
                     });
@@ -378,13 +485,14 @@
                 window.portalGoalsData = updatedData;
                 renderGoals();
                 cancelGoalsEdit();
-                alert("লক্ষ্য ও উদ্দেশ্য সফলভাবে আপডেট করা হয়েছে!");
+                alert("লক্ষ্য, উদ্দেশ্য ও ঘরগুলো সফলভাবে ফায়ারবেসে সেভ হয়েছে!");
             } catch (err) {
                 console.error(err);
-                alert("আপডেট করতে সমস্যা হয়েছে!");
+                alert("সেভ করতে সমস্যা হয়েছে!");
             }
         }
 
+        // Gallery Handlers
         function handleGalleryUpload(event) {
             const file = event.target.files[0];
             if(file) {
@@ -401,8 +509,9 @@
         async function saveGalleryImage() {
             const { addDoc, collection } = window.FirestoreLib;
             const caption = document.getElementById('galleryCaptionInput').value.trim();
+            
             if(!tempGalleryImgData) {
-                alert("দয়া করে একটি ছবি নির্বাচন করুন।");
+                alert("দয়া করে প্রথমে ছবি সিলেক্ট করুন।");
                 return;
             }
             try {
@@ -469,17 +578,6 @@
         }
         function closeLightbox(e) { document.getElementById('lightbox').classList.remove('active'); }
         function closeLightboxDirect() { document.getElementById('lightbox').classList.remove('active'); }
-        function triggerLogoUpload() { if(isAdmin) document.getElementById('logoFileInput').click(); }
-        function handleLogoUpload(e) {
-            const file = e.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    document.getElementById('logoDisplay').src = evt.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
     </script>
 </body>
 </html>
