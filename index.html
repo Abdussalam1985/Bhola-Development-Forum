@@ -107,14 +107,29 @@
         </div>
     </header>
 
-    <!-- Government Navigation Menu Bar (Tabs) -->
+    <!-- Marquee Notice Bar (চলমান নোটিশ বার) -->
+    <div class="bg-amber-400 text-slate-950 py-2 px-4 text-xs font-bold flex items-center shadow-inner">
+        <div class="bg-blue-950 text-white px-3 py-1 rounded text-[11px] uppercase tracking-wider mr-3 flex items-center gap-1 shrink-0">
+            <i class="fa-solid fa-bullhorn text-amber-400"></i> জরুরি নোটিশ:
+        </div>
+        <div class="overflow-hidden whitespace-nowrap w-full">
+            <marquee scrollamount="5" id="marqueeNoticeText" class="text-slate-900 font-semibold">
+                ভোলা জেলা উন্নয়ন কর্তৃপক্ষের নতুন পোর্টাল আপডেট করা হয়েছে। যেকোনো তথ্যের জন্য সংশ্লিষ্ট দপ্তরে যোগাযোগ করুন।
+            </marquee>
+        </div>
+        <div id="adminNoticeEditBtn" class="hidden shrink-0 ml-2">
+            <button onclick="editNoticePrompt()" class="bg-blue-900 text-white px-2 py-1 rounded text-[10px]">পরিবর্তন</button>
+        </div>
+    </div>
+
+    <!-- Government Navigation Menu Bar (Tabs with dropdown features) -->
     <nav id="navBarTheme" class="bg-blue-950 text-white shadow-md sticky top-0 z-50 border-b border-blue-900 transition-colors">
         <div class="max-w-6xl mx-auto px-4 flex flex-wrap items-center justify-between text-xs md:text-sm font-semibold">
             <div class="flex items-center overflow-x-auto py-2 gap-1 md:gap-2">
                 <button onclick="switchTab('home')" class="nav-tab px-3 py-2 rounded-lg bg-blue-800 text-white transition flex items-center gap-1.5"><i class="fa-solid fa-house"></i> হোম</button>
                 <button onclick="switchTab('about')" class="nav-tab px-3 py-2 rounded-lg hover:bg-blue-900 transition flex items-center gap-1.5"><i class="fa-solid fa-circle-info"></i> ভূমিকা ও পরিচিতি</button>
                 <button onclick="switchTab('committee')" class="nav-tab px-3 py-2 rounded-lg hover:bg-blue-900 transition flex items-center gap-1.5"><i class="fa-solid fa-users"></i> কমিটি <i class="fa-solid fa-lock text-[10px] text-amber-400"></i></button>
-                <button onclick="switchTab('finance')" class="nav-tab px-3 py-2 rounded-lg hover:bg-blue-900 transition flex items-center gap-1.5"><i class="fa-solid fa-wallet"></i> আর্থিক হিসাব <i class="fa-solid fa-lock text-[10px] text-amber-400"></i></button>
+                <button onclick="switchTab('finance')" class="nav-tab px-3 py-2 rounded-lg hover:bg-blue-900 transition flex items-center gap-1.5"><i class="fa-solid fa-wallet"></i> আর্থিক হিসাব ও ব্যবস্থাপনা <i class="fa-solid fa-lock text-[10px] text-amber-400"></i></button>
                 <button onclick="switchTab('gallery')" class="nav-tab px-3 py-2 rounded-lg hover:bg-blue-900 transition flex items-center gap-1.5"><i class="fa-solid fa-images"></i> গ্যালারি</button>
             </div>
             
@@ -158,7 +173,7 @@
                     </div>
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
-                            <label class="block text-xs font-bold text-slate-600">বিভাগ ও খাতসমূহ:</label>
+                            <label class="block text-xs font-bold text-slate-600">কার্যক্রম ও খাতসমূহ:</label>
                             <button type="button" onclick="addObjectiveInputField()" class="bg-emerald-600 text-white text-xs px-3 py-1 rounded-lg">+ নতুন খাত</button>
                         </div>
                         <div id="editObjectivesContainer" class="space-y-3"></div>
@@ -176,18 +191,22 @@
             <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-4">
                 <div class="flex justify-between items-center border-b pb-3">
                     <h2 class="text-base md:text-lg font-bold text-blue-900 flex items-center gap-2">
-                        <i class="fa-solid fa-circle-info text-amber-500"></i> ভূমিকা ও পরিচিতি
+                        <i class="fa-solid fa-circle-info text-amber-500"></i> ভূমিকা ও পরিচিতি এবং বিস্তারিত ইতিহাস
                     </h2>
                     <button id="editIntroBtn" onclick="toggleIntroEdit()" class="hidden bg-slate-200 text-slate-800 text-xs px-3 py-1 rounded-lg font-semibold">এডিট</button>
                 </div>
-                <div id="introDisplayView">
+                <div id="introDisplayView" class="space-y-3">
                     <p id="displayIntroText" class="text-sm text-slate-700 leading-relaxed">ভোলা জেলা উন্নয়ন কর্তৃপক্ষ একটি সেবামূলক ও প্রশাসনিক উন্নয়নমূলক প্ল্যাটফর্ম।</p>
+                    <div class="p-4 bg-slate-50 rounded-xl border text-xs text-slate-600">
+                        <span class="font-bold block text-blue-900 mb-1"><i class="fa-solid fa-calendar-days"></i> সর্বশেষ আপডেট:</span>
+                        <span id="introLastUpdate">তথ্য লোড হচ্ছে...</span>
+                    </div>
                 </div>
                 <div id="introEditView" class="hidden space-y-3">
-                    <textarea id="inputIntroText" class="w-full p-3 border rounded-xl text-xs" rows="4"></textarea>
+                    <textarea id="inputIntroText" class="w-full p-3 border rounded-xl text-xs" rows="5"></textarea>
                     <div class="flex justify-end gap-2">
                         <button onclick="cancelIntroEdit()" class="px-3 py-1.5 bg-gray-200 text-xs rounded-lg">বাতিল</button>
-                        <button onclick="saveIntroToFirebase()" class="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg font-bold">ভূমিকা সেভ করুন</button>
+                        <button onclick="saveIntroToFirebase()" class="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg font-bold">ভূমিকা ও তারিখ আপডেট সেভ করুন</button>
                     </div>
                 </div>
             </div>
@@ -199,21 +218,22 @@
                 <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-2xl">
                     <i class="fa-solid fa-lock"></i>
                 </div>
-                <h3 class="font-bold text-base text-slate-800">কমিটি তথ্য সুরক্ষিত</h3>
-                <p class="text-xs text-slate-500">এই তথ্যগুলো দেখতে বা এডিট করতে কমিটির পাসওয়ার্ড দিন (ডিফল্ট: 2026 বা অ্যাডমিন পাসওয়ার্ড)।</p>
+                <h3 class="font-bold text-base text-slate-800">কমিটি তথ্য সুরক্ষিত (পাসওয়ার্ড প্রটেক্টেড)</h3>
+                <p class="text-xs text-slate-500">এই সাব-মেনুটি দেখতে বা এর ভেերর কার্যক্রম পরিচালনা করতে পাসওয়ার্ড দিন (ডিফল্ট: 2026)।</p>
                 <input type="password" id="committeePasswordInput" placeholder="পাসওয়ার্ড লিখুন..." class="w-full p-2.5 text-center text-xs border rounded-xl outline-none">
                 <button onclick="verifyCommitteeAccess()" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl text-xs">প্রবেশ করুন</button>
             </div>
 
             <div id="committeeContentScreen" class="hidden bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-4">
-                <div class="flex justify-between items-center border-b pb-3">
-                    <h2 class="text-base font-bold text-blue-900"><i class="fa-solid fa-users text-amber-500 mr-2"></i> কতৃপক্ষ ও কমিটি সদস্যবৃন্দ</h2>
-                    <button onclick="saveCommitteeData()" class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-lg">কমিটি সেভ করুন</button>
+                <div class="flex justify-between items-center border-b pb-3 flex-wrap gap-2">
+                    <div>
+                        <h2 class="text-base font-bold text-blue-900"><i class="fa-solid fa-users text-amber-500 mr-2"></i> কতৃপক্ষ ও কমিটি সদস্যবৃন্দ ব্যবস্থাপনা</h2>
+                        <p class="text-[11px] text-slate-500">কমিটির প্রতিটি সদস্যের তথ্য, পদবি ও মেয়াদের তারিখ আপডেট করুন।</p>
+                    </div>
+                    <button onclick="saveCommitteeData()" class="bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-xl shadow">সকল কমিটি ডাটা সেভ করুন</button>
                 </div>
-                <div id="committeeMembersList" class="space-y-3">
-                    <!-- Dynamic Committee Member Cards -->
-                </div>
-                <button onclick="addCommitteeMember()" class="text-xs text-blue-600 font-bold hover:underline">+ নতুন সদস্য যোগ করুন</button>
+                <div id="committeeMembersList" class="space-y-3"></div>
+                <button onclick="addCommitteeMember()" class="text-xs text-blue-600 font-bold hover:underline bg-blue-50 p-2.5 rounded-xl block text-center border border-dashed border-blue-300">+ নতুন কমিটি সদস্য যোগ করুন</button>
             </div>
         </section>
 
@@ -223,34 +243,47 @@
                 <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl">
                     <i class="fa-solid fa-vault"></i>
                 </div>
-                <h3 class="font-bold text-base text-slate-800">আর্থিক ব্যবস্থাপনা ও হিসাব বিভাগ</h3>
-                <p class="text-xs text-slate-500">এটি গোপনীয় বিভাগ। হিসাব দেখতে পাসওয়ার্ড প্রদান করুন।</p>
+                <h3 class="font-bold text-base text-slate-800">আর্থিক ব্যবস্থাপনা ও হিসাব বিভাগ (সুরক্ষিত)</h3>
+                <p class="text-xs text-slate-500">এটি গোপনীয় সাব-মেনু। আর্থিক হিসাব, বাজেট ও খরচের বিবরণ দেখতে পাসওয়ার্ড দিন।</p>
                 <input type="password" id="financePasswordInput" placeholder="পাসওয়ার্ড লিখুন..." class="w-full p-2.5 text-center text-xs border rounded-xl outline-none">
                 <button onclick="verifyFinanceAccess()" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs">হিসাব প্যানেলে প্রবেশ করুন</button>
             </div>
 
-            <div id="financeContentScreen" class="hidden bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-4">
-                <div class="flex justify-between items-center border-b pb-3">
-                    <h2 class="text-base font-bold text-blue-900"><i class="fa-solid fa-wallet text-emerald-500 mr-2"></i> আর্থিক হিসাব ও বাজেট ব্যবস্থাপনা</h2>
-                    <button onclick="saveFinanceData()" class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-lg">হিসাব সেভ করুন</button>
+            <div id="financeContentScreen" class="hidden bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-6">
+                <div class="flex justify-between items-center border-b pb-3 flex-wrap gap-2">
+                    <div>
+                        <h2 class="text-base font-bold text-blue-900"><i class="fa-solid fa-wallet text-emerald-500 mr-2"></i> আর্থিক ব্যবস্থাপনা ও হিসাব বিবরণী</h2>
+                        <p class="text-[11px] text-slate-500" id="financeUpdateMeta">সর্বশেষ আপডেট: অদ্য</p>
+                    </div>
+                    <button onclick="saveFinanceData()" class="bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-xl shadow">হিসাবের বিবরণ সেভ করুন</button>
                 </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="bg-slate-50 p-4 rounded-xl border">
-                        <span class="text-[11px] text-slate-500 font-semibold">মোট বরাদ্দ / ফান্ড</span>
-                        <input type="number" id="financeTotalFund" class="w-full font-bold text-lg bg-white border p-2 rounded-lg mt-1" value="0">
+                        <span class="text-[11px] text-slate-500 font-semibold">মোট বরাদ্দ ফান্ড (টাকা)</span>
+                        <input type="number" id="financeTotalFund" class="w-full font-bold text-lg bg-white border p-2.5 rounded-lg mt-1" value="0">
                     </div>
                     <div class="bg-slate-50 p-4 rounded-xl border">
-                        <span class="text-[11px] text-slate-500 font-semibold">মোট ব্যয়</span>
-                        <input type="number" id="financeTotalExpense" class="w-full font-bold text-lg bg-white border p-2 rounded-lg mt-1" value="0">
+                        <span class="text-[11px] text-slate-500 font-semibold">মোট ব্যয় (টাকা)</span>
+                        <input type="number" id="financeTotalExpense" class="w-full font-bold text-lg bg-white border p-2.5 rounded-lg mt-1" value="0">
                     </div>
                     <div class="bg-slate-50 p-4 rounded-xl border">
                         <span class="text-[11px] text-slate-500 font-semibold">অবশিষ্ট স্থিতি</span>
-                        <h3 id="financeBalance" class="font-bold text-lg text-emerald-600 mt-2">৳ ০</h3>
+                        <h3 id="financeBalance" class="font-bold text-xl text-emerald-600 mt-2">৳ ০</h3>
                     </div>
                 </div>
+
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-bold text-slate-700">তারিখভিত্তিক খরচের খাত ও লেনদেনের বিবরণ:</label>
+                        <button onclick="addExpenseRow()" class="bg-blue-600 text-white text-[11px] px-3 py-1 rounded-lg">+ নতুন হিসাবের এন্ট্রি</button>
+                    </div>
+                    <div id="expenseRowsContainer" class="space-y-2"></div>
+                </div>
+
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">হিসাবের বিবরণ বা মন্তব্য নোট:</label>
-                    <textarea id="financeNotes" class="w-full p-3 border rounded-xl text-xs" rows="3" placeholder="আর্থিক বিবরণী বা খরচের খাতসমূহ এখানে লিখুন..."></textarea>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">সামগ্রিক আর্থিক মন্তব্য ও নোট:</label>
+                    <textarea id="financeNotes" class="w-full p-3 border rounded-xl text-xs" rows="3" placeholder="আর্থিক বিবরণী বা অডিট নোট এখানে লিখুন..."></textarea>
                 </div>
             </div>
         </section>
@@ -269,11 +302,11 @@
                     <div class="upload-zone" onclick="document.getElementById('galleryFileInput').click()">
                         <input type="file" id="galleryFileInput" class="hidden" accept="image/*" onchange="handleGalleryUpload(event)">
                         <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-500 mb-1"></i>
-                        <p class="text-xs font-bold text-slate-700">ছবি পরিবর্তন বা নির্বাচন করতে এখানে ক্লিক করুন</p>
+                        <p class="text-xs font-bold text-slate-700">ছবি পরিবর্তন বা আপলোড করতে এখানে ক্লিক করুন</p>
                     </div>
                     <div id="galleryPreviewArea" class="hidden flex items-center gap-4 bg-white p-3 rounded-xl border">
                         <img id="galleryPreviewImg" src="" class="w-16 h-16 rounded-lg object-cover border">
-                        <input type="text" id="galleryCaptionInput" placeholder="ছবির ক্যাপশন..." class="w-full p-2 border rounded-lg text-xs">
+                        <input type="text" id="galleryCaptionInput" placeholder="ছবির শিরোনাম বা ক্যাপশন..." class="w-full p-2 border rounded-lg text-xs">
                     </div>
                     <div class="flex justify-end">
                         <button onclick="saveGalleryImage()" class="bg-emerald-600 text-white font-bold py-2 px-5 rounded-xl text-xs shadow">গ্যালারিতে ছবি সেভ করুন</button>
@@ -299,10 +332,11 @@
         let tempLogoData = "";
         let tempGalleryImgData = "";
         window.galleryImages = [];
-        window.portalIntroData = "ভোলা জেলা উন্নয়ন কর্তৃপক্ষ একটি সেবামূলক ও প্রশাসনিক উন্নয়নমূলক প্ল্যাটফর্ম।";
+        window.portalIntroData = { text: "ভোলা জেলা উন্নয়ন কর্তৃপক্ষ একটি সেবামূলক প্ল্যাটফর্ম।", date: "অদ্য" };
         window.portalGoalsData = { vision: "ভোলা জেলার টেকসই উন্নয়ন...", objectives: [] };
-        window.committeeData = [{ name: "ড. মো. রফিকুল ইসলাম", role: "সভাপতি", phone: "01700000000" }];
-        window.financeData = { fund: 500000, expense: 120000, notes: "প্রাথমিক বাজেট বরাদ্দ ও খরচ।" };
+        window.committeeData = [{ name: "ড. মো. রফিকুল ইসলাম", role: "সভাপতি", phone: "01700000000", date: "২০২৬" }];
+        window.financeData = { fund: 500000, expense: 120000, notes: "প্রাথমিক বাজেট বরাদ্দ ও খরচ।", items: [], updateDate: "অদ্য" };
+        window.portalNotice = "ভোলা জেলা উন্নয়ন কর্তৃপক্ষের নতুন পোর্টাল আপডেট করা হয়েছে। যেকোনো তথ্যের জন্য সংশ্লিষ্ট দপ্তরে যোগাযোগ করুন।";
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -366,6 +400,7 @@
                     document.getElementById('editIntroBtn').classList.remove('hidden');
                     document.getElementById('galleryUploadPanel').classList.remove('hidden');
                     document.getElementById('adminThemeControl').classList.remove('hidden');
+                    document.getElementById('adminNoticeEditBtn').classList.remove('hidden');
                     if(tempLogoData) document.getElementById('logoSaveAction').classList.remove('hidden');
                     
                     // Unlock secured tabs automatically for admin
@@ -385,10 +420,22 @@
                 document.getElementById('editIntroBtn').classList.add('hidden');
                 document.getElementById('galleryUploadPanel').classList.add('hidden');
                 document.getElementById('adminThemeControl').classList.add('hidden');
+                document.getElementById('adminNoticeEditBtn').classList.add('hidden');
                 document.getElementById('committeeContentScreen').classList.add('hidden');
                 document.getElementById('committeeLockScreen').classList.remove('hidden');
                 document.getElementById('financeContentScreen').classList.add('hidden');
                 document.getElementById('financeLockScreen').classList.remove('hidden');
+            }
+        }
+
+        async function editNoticePrompt() {
+            let newNotice = prompt("চলমান নোটিশ বারের জন্য নতুন টেক্সট লিখুন:", window.portalNotice);
+            if(newNotice) {
+                window.portalNotice = newNotice;
+                const { doc, setDoc } = window.FirestoreLib;
+                await setDoc(doc(window.db, "portal_content", "bhola_notice"), { text: newNotice });
+                document.getElementById('marqueeNoticeText').innerText = newNotice;
+                alert("নোটিশ আপডেট হয়েছে!");
             }
         }
 
@@ -397,13 +444,20 @@
             const { doc, collection, onSnapshot } = window.FirestoreLib;
             const db = window.db;
 
+            onSnapshot(doc(db, "portal_content", "bhola_notice"), docSnap => {
+                if(docSnap.exists() && docSnap.data().text) {
+                    window.portalNotice = docSnap.data().text;
+                    document.getElementById('marqueeNoticeText').innerText = window.portalNotice;
+                }
+            });
             onSnapshot(doc(db, "portal_content", "bhola_logo"), docSnap => {
                 if(docSnap.exists() && docSnap.data().img) document.getElementById('logoDisplay').src = docSnap.data().img;
             });
             onSnapshot(doc(db, "portal_content", "bhola_intro"), docSnap => {
                 if(docSnap.exists()) {
-                    window.portalIntroData = docSnap.data().text || '';
-                    document.getElementById('displayIntroText').innerText = window.portalIntroData;
+                    window.portalIntroData = docSnap.data();
+                    document.getElementById('displayIntroText').innerText = window.portalIntroData.text || '';
+                    document.getElementById('introLastUpdate').innerText = window.portalIntroData.date || 'তারিখ সংরক্ষিত নেই';
                 }
             });
             onSnapshot(doc(db, "portal_content", "bhola_goals"), docSnap => {
@@ -440,13 +494,13 @@
             const list = document.getElementById('committeeMembersList');
             if(!list) return;
             list.innerHTML = '';
-            window.committeeData.forEach((m, idx) => {
-                list.innerHTML += `<div class="p-3 bg-slate-50 border rounded-xl flex gap-2 items-center"><input type="text" value="${m.name}" placeholder="নাম" class="comm-name p-2 text-xs border rounded w-1/3"><input type="text" value="${m.role}" placeholder="পদবি" class="comm-role p-2 text-xs border rounded w-1/3"><input type="text" value="${m.phone}" placeholder="ফোন" class="comm-phone p-2 text-xs border rounded w-1/3"><button onclick="this.parentElement.remove()" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div>`;
+            window.committeeData.forEach((m) => {
+                list.innerHTML += `<div class="p-3 bg-slate-50 border rounded-xl flex gap-2 items-center flex-wrap sm:flex-nowrap"><input type="text" value="${m.name}" placeholder="সদস্যের নাম" class="comm-name p-2 text-xs border rounded w-full sm:w-1/4"><input type="text" value="${m.role}" placeholder="পদবি" class="comm-role p-2 text-xs border rounded w-full sm:w-1/4"><input type="text" value="${m.phone}" placeholder="মোবাইল নম্বর" class="comm-phone p-2 text-xs border rounded w-full sm:w-1/4"><input type="text" value="${m.date || ''}" placeholder="মেয়াদ/তারিখ" class="comm-date p-2 text-xs border rounded w-full sm:w-1/4"><button onclick="this.parentElement.remove()" class="text-rose-500 p-2"><i class="fa-solid fa-trash"></i></button></div>`;
             });
         }
 
         function addCommitteeMember() {
-            window.committeeData.push({ name: "", role: "", phone: "" });
+            window.committeeData.push({ name: "", role: "", phone: "", date: new Date().toLocaleDateString('bn-BD') });
             renderCommittee();
         }
 
@@ -454,9 +508,10 @@
             const names = document.querySelectorAll('.comm-name');
             const roles = document.querySelectorAll('.comm-role');
             const phones = document.querySelectorAll('.comm-phone');
+            const dates = document.querySelectorAll('.comm-date');
             let members = [];
             for(let i=0; i<names.length; i++) {
-                if(names[i].value) members.push({ name: names[i].value, role: roles[i].value, phone: phones[i].value });
+                if(names[i].value) members.push({ name: names[i].value, role: roles[i].value, phone: phones[i].value, date: dates[i].value });
             }
             const { doc, setDoc } = window.FirestoreLib;
             await setDoc(doc(window.db, "portal_content", "bhola_committee"), { members });
@@ -467,18 +522,43 @@
             document.getElementById('financeTotalFund').value = window.financeData.fund || 0;
             document.getElementById('financeTotalExpense').value = window.financeData.expense || 0;
             document.getElementById('financeNotes').value = window.financeData.notes || '';
+            document.getElementById('financeUpdateMeta').innerText = `সর্বশেষ আপডেট: ${window.financeData.updateDate || 'অদ্য'}`;
             let bal = (window.financeData.fund || 0) - (window.financeData.expense || 0);
             document.getElementById('financeBalance').innerText = `৳ ${bal}`;
+
+            const container = document.getElementById('expenseRowsContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            if(window.financeData.items) {
+                window.financeData.items.forEach(item => {
+                    container.innerHTML += `<div class="p-2 bg-slate-50 border rounded-lg flex gap-2 items-center"><input type="text" value="${item.title}" placeholder="খাতের বিবরণ" class="fin-item-title p-1.5 text-xs border rounded w-1/2"><input type="number" value="${item.amount}" placeholder="টাকার পরিমাণ" class="fin-item-amount p-1.5 text-xs border rounded w-1/3"><input type="text" value="${item.date || ''}" placeholder="তারিখ" class="fin-item-date p-1.5 text-xs border rounded w-1/4"><button onclick="this.parentElement.remove()" class="text-rose-500 p-1"><i class="fa-solid fa-trash"></i></button></div>`;
+                });
+            }
+        }
+
+        function addExpenseRow() {
+            if(!window.financeData.items) window.financeData.items = [];
+            window.financeData.items.push({ title: "", amount: 0, date: new Date().toLocaleDateString('bn-BD') });
+            renderFinance();
         }
 
         async function saveFinanceData() {
             const fund = parseFloat(document.getElementById('financeTotalFund').value) || 0;
             const expense = parseFloat(document.getElementById('financeTotalExpense').value) || 0;
             const notes = document.getElementById('financeNotes').value;
+            const updateDate = new Date().toLocaleDateString('bn-BD');
+
+            const titles = document.querySelectorAll('.fin-item-title');
+            const amounts = document.querySelectorAll('.fin-item-amount');
+            const dates = document.querySelectorAll('.fin-item-date');
+            let items = [];
+            for(let i=0; i<titles.length; i++) {
+                if(titles[i].value) items.push({ title: titles[i].value, amount: parseFloat(amounts[i].value)||0, date: dates[i].value });
+            }
+
             const { doc, setDoc } = window.FirestoreLib;
-            await setDoc(doc(window.db, "portal_content", "bhola_finance"), { fund, expense, notes });
-            renderFinance();
-            alert("আর্থিক হিসাব সফলভাবে ফায়ারবেসে সেভ হয়েছে!");
+            await setDoc(doc(window.db, "portal_content", "bhola_finance"), { fund, expense, notes, items, updateDate });
+            alert("আর্থিক হিসাব ও বিবরণী সফলভাবে ফায়ারবেসে সেভ হয়েছে!");
         }
 
         function triggerLogoUpload() { if(isAdmin) document.getElementById('logoFileInput').click(); }
@@ -501,7 +581,7 @@
         function toggleIntroEdit() {
             document.getElementById('introDisplayView').classList.add('hidden');
             document.getElementById('introEditView').classList.remove('hidden');
-            document.getElementById('inputIntroText').value = window.portalIntroData;
+            document.getElementById('inputIntroText').value = window.portalIntroData.text || '';
         }
         function cancelIntroEdit() {
             document.getElementById('introEditView').classList.add('hidden');
@@ -509,10 +589,11 @@
         }
         async function saveIntroToFirebase() {
             const text = document.getElementById('inputIntroText').value;
+            const date = new Date().toLocaleDateString('bn-BD');
             const { doc, setDoc } = window.FirestoreLib;
-            await setDoc(doc(window.db, "portal_content", "bhola_intro"), { text });
+            await setDoc(doc(window.db, "portal_content", "bhola_intro"), { text, date });
             cancelIntroEdit();
-            alert("ভূমিকা সেভ হয়েছে!");
+            alert("ভূমিকা ও তারিখ সফলভাবে সেভ হয়েছে!");
         }
 
         function toggleGoalsEditMode() {
@@ -530,7 +611,7 @@
             document.getElementById('goalsDisplayView').classList.remove('hidden');
         }
         function addObjectiveInputField(cat='', title='', desc='') {
-            document.getElementById('editObjectivesContainer').innerHTML += `<div class="p-3 bg-white border rounded-xl space-y-2 relative"><button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button><div class="grid grid-cols-2 gap-2 pr-6"><input type="text" placeholder="খাত" class="edit-cat p-2 text-xs border rounded" value="${cat}"><input type="text" placeholder="শিরোনাম" class="edit-title p-2 text-xs border rounded" value="${title}"></div><textarea placeholder="বিবরণ" class="edit-desc w-full p-2 text-xs border rounded" rows="2">${desc}</textarea></div>`;
+            document.getElementById('editObjectivesContainer').innerHTML += `<div class="p-3 bg-white border rounded-xl space-y-2 relative"><button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button><div class="grid grid-cols-2 gap-2 pr-6"><input type="text" placeholder="খাত বা বিভাগ" class="edit-cat p-2 text-xs border rounded" value="${cat}"><input type="text" placeholder="শিরোনাম" class="edit-title p-2 text-xs border rounded" value="${title}"></div><textarea placeholder="বিস্তারিত বিবরণ" class="edit-desc w-full p-2 text-xs border rounded" rows="2">${desc}</textarea></div>`;
         }
         async function saveGoalsToFirebase() {
             const vision = document.getElementById('inputVision').value;
@@ -563,7 +644,7 @@
         }
         async function deleteGalleryImage(id) {
             const { deleteDoc, doc } = window.FirestoreLib;
-            if(confirm("মুছে ফেলতে চান?")) await deleteDoc(doc(window.db, "gallery", id));
+            if(confirm("ছবিটি মুছে ফেলতে চান?")) await deleteDoc(doc(window.db, "gallery", id));
         }
         function renderGallery() {
             const grid = document.getElementById('galleryGrid'), empty = document.getElementById('galleryEmpty');
