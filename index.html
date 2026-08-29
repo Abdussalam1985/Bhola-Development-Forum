@@ -30,7 +30,7 @@
                 <div>
                     <h1 class="text-xl md:text-3xl font-black tracking-wide" data-translate="appName">ভোলা ডেভেলপমেন্ট ফোরাম</h1>
                     <p class="text-xs md:text-sm text-blue-100 mt-1 font-medium">
-                        <span data-translate="genSecLabel">সাধারণ সম্পাদক</span>: <span id="genSecDisplay" class="text-amber-300 font-bold">মোঃ জসিম উদ্দিন বাবুল</span>
+                        <span data-translate="genSecLabel">সাধারণ সম্পাদক</span>: <span class="text-amber-300 font-bold">মোঃ জসিম উদ্দিন বাবুল</span>
                     </p>
                 </div>
             </div>
@@ -197,7 +197,7 @@
                     </button>
                 </div>
                 <div id="executiveList" class="space-y-2.5">
-                    <!-- Dynamic Executive List with Delete options -->
+                    <!-- Dynamic Executive List -->
                 </div>
             </section>
 
@@ -221,7 +221,7 @@
 
     <!-- Footer -->
     <footer id="footerTheme" class="bg-blue-900 text-white py-6 text-center text-sm border-t-4 border-amber-400 mt-12 transition-colors duration-300">
-        <p data-translate="footerCopyright">© 2026 ভোলা ডেভেলপমেন্ট ফোরাম</p>
+        <p data-translate="footerCopyright">© 2026 ভোলা ডেভেলপমেন্ট ফোরাম | সাধারণ সম্পাদক: মোঃ জসিম উদ্দিন বাবুল</p>
     </footer>
 
     <!-- Script Section -->
@@ -264,7 +264,7 @@
                 addPosBtn: "পদ যোগ করুন",
                 generalTitle: "সাধারণ সদস্যবৃন্দ",
                 addMemberBtn: "সদস্য যোগ করুন",
-                footerCopyright: "© 2026 ভোলা ডেভেলপমেন্ট ফোরাম"
+                footerCopyright: "© 2026 ভোলা ডেভেলপমেন্ট ফোরাম | সাধারণ সম্পাদক: মোঃ জসিম উদ্দিন বাবুল"
             },
             en: {
                 appName: "Bhola Development Forum",
@@ -303,7 +303,7 @@
                 addPosBtn: "Add Position",
                 generalTitle: "General Members List",
                 addMemberBtn: "Add Member",
-                footerCopyright: "© 2026 Bhola Development Forum"
+                footerCopyright: "© 2026 Bhola Development Forum | General Secretary: Md. Jasim Uddin Babul"
             }
         };
 
@@ -395,11 +395,18 @@
 
         let noticeText = localStorage.getItem('bhola_notice') || 'ভোলা ডেভেলপমেন্ট ফোরামের অফিশিয়াল অনলাইন পোর্টালে স্বাগতম।';
         let customLogo = localStorage.getItem('bhola_logo') || 'https://via.placeholder.com/192';
-        let generalSecretaryName = "মোঃ জসিম উদ্দিন বাবুল";
-        let transactions = JSON.parse(localStorage.getItem('bhola_transactions')) || [];
+        
+        // 브라우জার লোকালস্টোরেজে পুরনো ডেটা মেমোরি ক্লিয়ার করার জন্য ডিফল্ট ঠিক করে দেওয়া হলো
+        let savedExec = JSON.parse(localStorage.getItem('bhola_executives'));
+        if(!savedExec || savedExec.some(e => e.role === 'সাধারণ সম্পাদক' && e.name !== 'মোঃ জসিম উদ্দিন বাবুল')) {
+            localStorage.setItem('bhola_executives', JSON.stringify([
+                { name: 'মোঃ জসিম উদ্দিন বাবুল', role: 'সাধারণ সম্পাদক' }
+            ]));
+        }
         let executives = JSON.parse(localStorage.getItem('bhola_executives')) || [
             { name: 'মোঃ জসিম উদ্দিন বাবুল', role: 'সাধারণ সম্পাদক' }
         ];
+        let transactions = JSON.parse(localStorage.getItem('bhola_transactions')) || [];
         let generals = JSON.parse(localStorage.getItem('bhola_generals')) || [];
 
         function triggerLogoUpload() {
@@ -485,7 +492,6 @@
             if(isAdmin && confirm('Delete?')) { transactions.splice(i, 1); saveData(); }
         }
 
-        // কার্যনির্বাহী কমিটিতে নতুন পদ ও সদস্য যুক্ত করার ফাংশন
         function addExecutiveMember() {
             if(!isAdmin) return;
             let name = prompt(currentLang === 'bn' ? "সদস্যের নাম লিখুন:" : "Enter name:");
@@ -496,7 +502,6 @@
             }
         }
 
-        // কার্যনির্বাহী কমিটির সদস্য বা পদ বাদ দেওয়ার ফাংশন
         function deleteExecutiveMember(i) {
             if(isAdmin && confirm(currentLang === 'bn' ? 'আপনি কি এই পদটি বাদ দিতে চান?' : 'Do you want to delete this position?')) { 
                 executives.splice(i, 1); 
@@ -524,9 +529,6 @@
         function renderAll() {
             document.getElementById('runningNoticeDisplay').innerText = noticeText;
             document.getElementById('noticeInputBox').value = noticeText;
-
-            const genSecDisp = document.getElementById('genSecDisplay');
-            if(genSecDisp) genSecDisp.innerText = generalSecretaryName;
 
             document.getElementById('logoDisplay').src = customLogo;
             document.getElementById('appFavicon').href = customLogo;
@@ -580,7 +582,6 @@
             document.getElementById('totalExpenseDisp').innerText = '৳ ' + totalExp.toLocaleString();
             document.getElementById('netBalanceDisp').innerText = '৳ ' + (totalInc - totalExp).toLocaleString();
 
-            // Render Executive Committee with delete capability for admin
             let execList = document.getElementById('executiveList');
             execList.innerHTML = '';
             if(executives.length === 0) {
@@ -598,9 +599,8 @@
                 });
             }
 
-            // Render General Members with delete capability for admin
             let genList = document.getElementById('generalList');
-            genList.innerHTML = '';
+            genList.innerHTML = ``;
             if(generals.length === 0) {
                 genList.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">কোনো সাধারণ সদস্য যুক্ত করা হয়নি।</p>`;
             } else {
