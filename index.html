@@ -28,7 +28,6 @@
         window.db = db;
         window.FirestoreLib = { collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc, onSnapshot };
 
-        // Initialize Data Load from Firebase
         document.dispatchEvent(new Event('firebase-ready'));
     </script>
 
@@ -123,7 +122,7 @@
     <main class="max-w-6xl mx-auto px-4 py-6 space-y-8">
 
         <!-- Live Clock & Last Updated Bar -->
-        <div class="flex flex-col sm:flex-row justify-between items-center bg-white border border-slate-200 card-bg p-4 rounded-2xl shadow-sm text-xs md:text-sm gap-2 fade-in">
+        <div class="flex flex-col sm:flex-row justify-between items-center bg-white border border-slate-200 dynamic-card p-4 rounded-2xl shadow-sm text-xs md:text-sm gap-2 fade-in">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-clock text-blue-600"></i>
                 <span data-translate="liveTimeLabel">লাইভ সময়:</span>
@@ -136,23 +135,38 @@
             </div>
         </div>
 
+        <!-- Admin Password Change Section (Visible only when logged in) -->
+        <section id="adminSettingsSection" class="hidden bg-white border border-slate-200 dynamic-card p-5 rounded-2xl shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4 fade-in">
+            <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center font-bold"><i class="fa-solid fa-key"></i></div>
+                <div>
+                    <h4 class="font-bold text-sm" data-translate="adminSettingsTitle">অ্যাডমিন পাসওয়ার্ড পরিবর্তন</h4>
+                    <p class="text-xs text-slate-400" data-translate="adminSettingsSub">প্যানেল সুরক্ষার জন্য পাসওয়ার্ড পরিবর্তন করুন</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <input type="password" id="newPasswordInput" placeholder="নতুন পাসওয়ার্ড লিখুন..." class="p-2 rounded-xl border border-slate-200 text-xs bg-transparent outline-none w-full sm:w-48">
+                <button onclick="changeAdminPassword()" class="bg-amber-500 text-blue-950 font-bold px-4 py-2 rounded-xl text-xs hover:bg-amber-400 shadow shrink-0" data-translate="changePassBtn">পরিবর্তন করুন</button>
+            </div>
+        </section>
+
         <!-- Dashboard Stat Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 fade-in">
-            <div class="bg-white border border-slate-200 card-bg p-6 rounded-2xl shadow-sm border-l-4 border-emerald-500 flex items-center justify-between">
+            <div class="bg-white border border-slate-200 dynamic-card p-6 rounded-2xl shadow-sm border-l-4 border-emerald-500 flex items-center justify-between">
                 <div>
                     <p class="text-xs text-slate-400 uppercase font-semibold" data-translate="totalIncomeCard">মোট আয়</p>
                     <h2 id="totalIncomeDisp" class="text-2xl md:text-3xl font-black text-emerald-600 mt-1">৳ 0</h2>
                 </div>
                 <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-arrow-down-long"></i></div>
             </div>
-            <div class="bg-white border border-slate-200 card-bg p-6 rounded-2xl shadow-sm border-l-4 border-rose-500 flex items-center justify-between">
+            <div class="bg-white border border-slate-200 dynamic-card p-6 rounded-2xl shadow-sm border-l-4 border-rose-500 flex items-center justify-between">
                 <div>
                     <p class="text-xs text-slate-400 uppercase font-semibold" data-translate="totalExpenseCard">মোট ব্যয়</p>
                     <h2 id="totalExpenseDisp" class="text-2xl md:text-3xl font-black text-rose-600 mt-1">৳ 0</h2>
                 </div>
                 <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-arrow-up-long"></i></div>
             </div>
-            <div class="bg-white border border-slate-200 card-bg p-6 rounded-2xl shadow-sm border-l-4 border-blue-500 flex items-center justify-between">
+            <div class="bg-white border border-slate-200 dynamic-card p-6 rounded-2xl shadow-sm border-l-4 border-blue-500 flex items-center justify-between">
                 <div>
                     <p class="text-xs text-slate-400 uppercase font-semibold" data-translate="balanceCard">বর্তমান স্থিতি</p>
                     <h2 id="netBalanceDisp" class="text-2xl md:text-3xl font-black text-blue-600 mt-1">৳ 0</h2>
@@ -162,8 +176,8 @@
         </div>
 
         <!-- Admin Transaction Form Section -->
-        <section id="transactionFormSection" class="hidden bg-white border border-slate-200 card-bg p-6 rounded-2xl shadow-sm space-y-4 fade-in">
-            <h3 class="font-bold text-sm md:text-base text-blue-900 flex items-center gap-2">
+        <section id="transactionFormSection" class="hidden bg-white border border-slate-200 dynamic-card p-6 rounded-2xl shadow-sm space-y-4 fade-in">
+            <h3 class="font-bold text-sm md:text-base text-blue-900 dark:text-blue-400 flex items-center gap-2">
                 <i class="fa-solid fa-circle-plus"></i> <span data-translate="addNewTransTitle">নতুন আয় / ব্যয় যোগ করুন (অ্যাডমিন প্যানেল)</span>
             </h3>
             <form id="transactionForm" onsubmit="addTransaction(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
@@ -193,15 +207,15 @@
         </section>
 
         <!-- Income & Expense Ledger Table -->
-        <section class="bg-white border border-slate-200 card-bg rounded-2xl shadow-sm overflow-hidden fade-in">
-            <div class="p-5 border-b border-slate-200 flex justify-between items-center">
+        <section class="bg-white border border-slate-200 dynamic-card rounded-2xl shadow-sm overflow-hidden fade-in">
+            <div class="p-5 border-b border-slate-200 dynamic-border flex justify-between items-center">
                 <h3 class="font-bold text-sm md:text-base" data-translate="ledgerTableTitle">বিস্তারিত আয় ও ব্যয়ের হিসাব</h3>
                 <span class="text-xs bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full font-semibold"><i class="fa-solid fa-cloud text-[10px] mr-1"></i>লাইভ ডাটাবেজ</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs md:text-sm">
                     <thead>
-                        <tr class="bg-slate-50 text-slate-400 uppercase text-[11px] font-semibold border-b border-slate-200">
+                        <tr class="bg-slate-50 dark:bg-slate-800 text-slate-400 uppercase text-[11px] font-semibold border-b border-slate-200 dynamic-border">
                             <th class="p-3.5" data-translate="thDate">তারিখ</th>
                             <th class="p-3.5" data-translate="thDesc">বিবরণ</th>
                             <th class="p-3.5" data-translate="thType">ধরন</th>
@@ -210,7 +224,7 @@
                             <th id="actionHeaderTh" class="p-3.5 text-center hidden" data-translate="thAction">অ্যাকশন</th>
                         </tr>
                     </thead>
-                    <tbody id="ledgerTableBody" class="divide-y divide-slate-100">
+                    <tbody id="ledgerTableBody" class="divide-y divide-slate-100 dynamic-divide">
                         <!-- Dynamic Records -->
                     </tbody>
                 </table>
@@ -218,7 +232,7 @@
         </section>
 
         <!-- GALLERY CORNER SECTION -->
-        <section id="gallerySection" class="bg-white border border-slate-200 card-bg p-6 rounded-2xl shadow-sm space-y-5 fade-in">
+        <section id="gallerySection" class="bg-white border border-slate-200 dynamic-card p-6 rounded-2xl shadow-sm space-y-5 fade-in">
             <div class="flex justify-between items-center flex-wrap gap-3">
                 <h3 class="font-bold text-sm md:text-base flex items-center gap-2">
                     <i class="fa-solid fa-images text-blue-600"></i> <span data-translate="galleryTitle">কার্যক্রম ও ফটো গ্যালারি কর্নার</span>
@@ -278,6 +292,9 @@
                 lastUpdateLabel: "সর্বশেষ আপডেট:",
                 noticeLabel: "জরুরি নোটিশ:",
                 updateNoticeBtn: "সেভ",
+                adminSettingsTitle: "অ্যাডমিন পাসওয়ার্ড পরিবর্তন",
+                adminSettingsSub: "প্যানেল সুরক্ষার জন্য পাসওয়ার্ড পরিবর্তন করুন",
+                changePassBtn: "পরিবর্তন করুন",
                 totalIncomeCard: "মোট আয়",
                 totalExpenseCard: "মোট ব্যয়",
                 balanceCard: "বর্তমান স্থিতি",
@@ -301,8 +318,7 @@
                 galleryUploadText: "ছবি আপলোড করতে ক্লিক করুন",
                 galleryCaptionLabel: "ছবির বিবরণ / ক্যাপশন",
                 gallerySaveBtn: "গ্যালারিতে সেভ করুন",
-                galleryEmptyText: "এখনো কোনো ছবি যোগ করা হয়নি।",
-                galleryDeleteConfirm: "আপনি কি এই ছবিটি মুছে ফেলতে চান?"
+                galleryEmptyText: "এখনো কোনো ছবি যোগ করা হয়নি।"
             },
             en: {
                 appName: "Bhola Development Forum",
@@ -316,6 +332,9 @@
                 lastUpdateLabel: "Last Updated:",
                 noticeLabel: "Notice:",
                 updateNoticeBtn: "Update",
+                adminSettingsTitle: "Change Admin Password",
+                adminSettingsSub: "Update password for panel security",
+                changePassBtn: "Change",
                 totalIncomeCard: "Total Income",
                 totalExpenseCard: "Total Expense",
                 balanceCard: "Current Balance",
@@ -339,8 +358,7 @@
                 galleryUploadText: "Click to upload photo",
                 galleryCaptionLabel: "Photo caption",
                 gallerySaveBtn: "Save to Gallery",
-                galleryEmptyText: "No photos added yet.",
-                galleryDeleteConfirm: "Are you sure you want to delete this photo?"
+                galleryEmptyText: "No photos added yet."
             }
         };
 
@@ -368,29 +386,55 @@
         updateLiveClock();
 
         let isAdmin = false;
-        let adminPass = "2026";
         let isDarkMode = false;
 
+        // Toggle Dark/Light Mode
         function toggleDarkMode() {
             isDarkMode = !isDarkMode;
             const body = document.getElementById('mainBody');
-            const cards = document.querySelectorAll('.card-bg');
+            const cards = document.querySelectorAll('.dynamic-card');
+            const modeIcon = document.getElementById('modeIcon');
+            const modeText = document.getElementById('modeText');
+
             if(isDarkMode) {
                 body.className = "bg-slate-950 text-slate-100 transition-colors duration-300";
-                cards.forEach(c => c.classList.add('bg-slate-900', 'border-slate-800'));
+                cards.forEach(c => {
+                    c.classList.remove('bg-white', 'border-slate-200');
+                    c.classList.add('bg-slate-900', 'border-slate-800');
+                });
+                modeIcon.className = "fa-solid fa-sun text-amber-400";
+                modeText.innerText = currentLang === 'bn' ? "Light Mode" : "Light Mode";
             } else {
                 body.className = "bg-slate-100 text-slate-800 transition-colors duration-300";
-                cards.forEach(c => c.classList.remove('bg-slate-900', 'border-slate-800'));
+                cards.forEach(c => {
+                    c.classList.remove('bg-slate-900', 'border-slate-800');
+                    c.classList.add('bg-white', 'border-slate-200');
+                });
+                modeIcon.className = "fa-solid fa-moon";
+                modeText.innerText = currentLang === 'bn' ? "Dark Mode" : "Dark Mode";
             }
         }
 
-        function toggleAdminMode() {
+        // Admin Login & Logout Handler
+        async function toggleAdminMode() {
+            const { doc, getDoc } = window.FirestoreLib;
+            
+            // Fetch current password from Firebase (Default is '2026')
+            let currentPassword = "2026";
+            try {
+                const passDoc = await getDoc(doc(window.db, "settings", "password"));
+                if(passDoc.exists()) {
+                    currentPassword = passDoc.data().value;
+                }
+            } catch(e) {}
+
             if(!isAdmin) {
                 let pass = prompt("অ্যাডমিন পাসওয়ার্ড লিখুন:");
-                if(pass === adminPass) {
+                if(pass === currentPassword) {
                     isAdmin = true;
-                    document.getElementById('authBtn').innerHTML = `<i class="fa-solid fa-lock-open"></i> লগআউট`;
+                    document.getElementById('authBtn').innerHTML = `<i class="fa-solid fa-lock-open"></i> ${translations[currentLang].adminLogout}`;
                     document.getElementById('transactionFormSection').classList.remove('hidden');
+                    document.getElementById('adminSettingsSection').classList.remove('hidden');
                     document.getElementById('actionHeaderTh').classList.remove('hidden');
                     document.getElementById('noticeEditContainer').classList.remove('hidden');
                     document.getElementById('noticeEditContainer').classList.add('flex');
@@ -401,13 +445,29 @@
                 }
             } else {
                 isAdmin = false;
-                document.getElementById('authBtn').innerHTML = `<i class="fa-solid fa-lock"></i> অ্যাডমিন লগইন`;
+                document.getElementById('authBtn').innerHTML = `<i class="fa-solid fa-lock"></i> ${translations[currentLang].adminLogin}`;
                 document.getElementById('transactionFormSection').classList.add('hidden');
+                document.getElementById('adminSettingsSection').classList.add('hidden');
                 document.getElementById('actionHeaderTh').classList.add('hidden');
                 document.getElementById('noticeEditContainer').classList.remove('flex');
                 document.getElementById('noticeEditContainer').classList.add('hidden');
                 document.getElementById('galleryUploadPanel').classList.add('hidden');
                 loadAllDataFromFirebase();
+            }
+        }
+
+        // Change Password Function
+        async function changeAdminPassword() {
+            const { doc, setDoc } = window.FirestoreLib;
+            const newPass = document.getElementById('newPasswordInput').value.trim();
+            if(!newPass) {
+                alert("দয়া করে নতুন পাসওয়ার্ড লিখুন।");
+                return;
+            }
+            if(confirm("আপনি কি নিশ্চিত যে অ্যাডমিন পাসওয়ার্ড পরিবর্তন করতে চান?")) {
+                await setDoc(doc(window.db, "settings", "password"), { value: newPass });
+                document.getElementById('newPasswordInput').value = '';
+                alert("অ্যাডমিন পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!");
             }
         }
 
@@ -417,7 +477,7 @@
         });
 
         async function loadAllDataFromFirebase() {
-            const { collection, getDocs, doc, getDoc, onSnapshot } = window.FirestoreLib;
+            const { collection, doc, onSnapshot } = window.FirestoreLib;
             const db = window.db;
 
             // Real-time Notice Listener
@@ -440,7 +500,6 @@
             onSnapshot(collection(db, "gallery"), (snapshot) => {
                 window.galleryImages = [];
                 snapshot.forEach(doc => { window.galleryImages.push({ id: doc.id, ...doc.data() }); });
-                // Sort by date descending if possible
                 window.galleryImages.sort((a,b) => b.timestamp - a.timestamp);
                 renderGallery();
             });
@@ -488,7 +547,7 @@
                 else totalExp += t.amount;
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800 transition";
                 tr.innerHTML = `
                     <td class="p-3.5 whitespace-nowrap">${t.date}</td>
                     <td class="p-3.5 font-medium">${t.desc}</td>
