@@ -63,15 +63,18 @@
         </div>
     </header>
 
-    <!-- Notice Bar -->
-    <div id="noticeBarTheme" class="bg-blue-950 text-white shadow-md border-b border-black/20 transition-colors duration-300 py-2.5 px-4">
-        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs md:text-sm">
-            <div class="flex items-center gap-2 overflow-hidden w-full">
-                <span class="bg-amber-500 text-blue-950 font-black px-2 py-0.5 rounded text-[11px] uppercase tracking-wider shrink-0" data-translate="noticeLabel">জরুরি নোটিশ:</span>
-                <p id="runningNoticeDisplay" class="truncate font-medium text-amber-200">ভোলা ডেভেলপমেন্ট ফোরামের অফিশিয়াল অনলাইন পোর্টালে স্বাগতম।</p>
+    <!-- Notice Bar (Moving/Marquee enabled) -->
+    <div id="noticeBarTheme" class="bg-blue-950 text-white shadow-md border-b border-black/20 transition-colors duration-300 py-2.5 px-4 flex items-center">
+        <div class="max-w-6xl mx-auto w-full flex items-center gap-3 text-xs md:text-sm">
+            <span class="bg-amber-500 text-blue-950 font-black px-2.5 py-1 rounded text-[11px] uppercase tracking-wider shrink-0 z-10 shadow" data-translate="noticeLabel">জরুরি নোটিশ:</span>
+            
+            <!-- Marquee Running Text -->
+            <div class="overflow-hidden whitespace-nowrap w-full relative">
+                <marquee scrollamount="5" id="runningNoticeDisplay" class="font-medium text-amber-200">ভোলা ডেভেলপমেন্ট ফোরামের অফিশিয়াল অনলাইন পোর্টালে স্বাগতম।</marquee>
             </div>
-            <div id="noticeEditContainer" class="hidden items-center gap-2 w-full sm:w-auto shrink-0">
-                <input type="text" id="noticeInputBox" placeholder="নোটিশ আপডেট করুন..." class="px-3 py-1 rounded-lg text-slate-800 text-xs w-full sm:w-64 outline-none">
+
+            <div id="noticeEditContainer" class="hidden items-center gap-2 shrink-0 z-10">
+                <input type="text" id="noticeInputBox" placeholder="নোটিশ আপডেট করুন..." class="px-3 py-1 rounded-lg text-slate-800 text-xs w-48 sm:w-64 outline-none">
                 <button onclick="updateNoticeText()" class="bg-amber-400 text-blue-950 font-bold px-3 py-1 rounded-lg hover:bg-amber-300 text-xs shrink-0" data-translate="updateNoticeBtn">সেভ</button>
             </div>
         </div>
@@ -376,7 +379,7 @@
             let noticeBg = currentTheme === 'teal' ? 'bg-teal-950' : currentTheme === 'purple' ? 'bg-purple-950' : 'bg-blue-950';
 
             header.className = `${headerBg} text-white shadow-xl py-5 px-4 border-b-4 border-amber-400 transition-colors duration-300`;
-            noticeBar.className = `${noticeBg} text-white shadow-md border-b border-black/20 transition-colors duration-300`;
+            noticeBar.className = `${noticeBg} text-white shadow-md border-b border-black/20 transition-colors duration-300 py-2.5 px-4 flex items-center`;
             footer.className = `${headerBg} text-white py-6 text-center text-sm border-t-4 border-amber-400 mt-12 transition-colors duration-300`;
 
             if(isDarkMode) {
@@ -396,7 +399,6 @@
         let noticeText = localStorage.getItem('bhola_notice') || 'ভোলা ডেভেলপমেন্ট ফোরামের অফিশিয়াল অনলাইন পোর্টালে স্বাগতম।';
         let customLogo = localStorage.getItem('bhola_logo') || 'https://via.placeholder.com/192';
         
-        // 브라우জার লোকালস্টোরেজে পুরনো ডেটা মেমোরি ক্লিয়ার করার জন্য ডিফল্ট ঠিক করে দেওয়া হলো
         let savedExec = JSON.parse(localStorage.getItem('bhola_executives'));
         if(!savedExec || savedExec.some(e => e.role === 'সাধারণ সম্পাদক' && e.name !== 'মোঃ জসিম উদ্দিন বাবুল')) {
             localStorage.setItem('bhola_executives', JSON.stringify([
