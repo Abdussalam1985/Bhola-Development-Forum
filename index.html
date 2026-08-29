@@ -89,7 +89,15 @@
                     </p>
                 </div>
             </div>
+            
             <div class="flex flex-wrap items-center justify-center gap-2.5">
+                <!-- Color Theme Switcher (Knobs) -->
+                <div class="flex items-center gap-1.5 bg-black/20 p-1.5 rounded-xl border border-white/10">
+                    <button onclick="setThemeColor('blue')" title="Blue Theme" class="w-5 h-5 rounded-full bg-blue-700 hover:scale-110 transition border border-white"></button>
+                    <button onclick="setThemeColor('emerald')" title="Emerald Theme" class="w-5 h-5 rounded-full bg-emerald-700 hover:scale-110 transition border border-white"></button>
+                    <button onclick="setThemeColor('purple')" title="Purple Theme" class="w-5 h-5 rounded-full bg-purple-700 hover:scale-110 transition border border-white"></button>
+                </div>
+
                 <button onclick="toggleDarkMode()" class="bg-black/20 hover:bg-black/30 border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
                     <i id="modeIcon" class="fa-solid fa-moon"></i>
                     <span id="modeText">Dark Mode</span>
@@ -135,7 +143,7 @@
             </div>
         </div>
 
-        <!-- Admin Password Change Section (Visible only when logged in) -->
+        <!-- Admin Password Change Section -->
         <section id="adminSettingsSection" class="hidden bg-white border border-slate-200 dynamic-card p-5 rounded-2xl shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4 fade-in">
             <div class="flex items-center gap-2.5">
                 <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center font-bold"><i class="fa-solid fa-key"></i></div>
@@ -387,6 +395,26 @@
 
         let isAdmin = false;
         let isDarkMode = false;
+        let currentThemeColor = 'blue';
+
+        // Color Theme Knobs Switcher
+        function setThemeColor(color) {
+            currentThemeColor = color;
+            const header = document.getElementById('headerTheme');
+            const footer = document.getElementById('footerTheme');
+            const noticeBar = document.getElementById('noticeBarTheme');
+
+            let headerBg = "bg-blue-900", footerBg = "bg-blue-900", noticeBg = "bg-blue-950";
+            if(color === 'emerald') {
+                headerBg = "bg-emerald-900"; footerBg = "bg-emerald-900"; noticeBg = "bg-emerald-950";
+            } else if(color === 'purple') {
+                headerBg = "bg-purple-900"; footerBg = "bg-purple-900"; noticeBg = "bg-purple-950";
+            }
+
+            header.className = `${headerBg} text-white shadow-xl py-5 px-4 border-b-4 border-amber-400 transition-colors duration-300`;
+            footer.className = `${footerBg} text-white py-6 text-center text-sm border-t-4 border-amber-400 mt-12 transition-colors duration-300`;
+            noticeBar.className = `${noticeBg} text-white shadow-md border-b border-black/20 transition-colors duration-300 py-2.5 px-4 flex items-center`;
+        }
 
         // Toggle Dark/Light Mode
         function toggleDarkMode() {
@@ -418,14 +446,10 @@
         // Admin Login & Logout Handler
         async function toggleAdminMode() {
             const { doc, getDoc } = window.FirestoreLib;
-            
-            // Fetch current password from Firebase (Default is '2026')
             let currentPassword = "2026";
             try {
                 const passDoc = await getDoc(doc(window.db, "settings", "password"));
-                if(passDoc.exists()) {
-                    currentPassword = passDoc.data().value;
-                }
+                if(passDoc.exists()) { currentPassword = passDoc.data().value; }
             } catch(e) {}
 
             if(!isAdmin) {
@@ -480,7 +504,6 @@
             const { collection, doc, onSnapshot } = window.FirestoreLib;
             const db = window.db;
 
-            // Real-time Notice Listener
             onSnapshot(doc(db, "settings", "notice"), (docSnap) => {
                 if (docSnap.exists()) {
                     const noticeText = docSnap.data().text;
@@ -489,14 +512,12 @@
                 }
             });
 
-            // Real-time Transactions Listener
             onSnapshot(collection(db, "transactions"), (snapshot) => {
                 let transactions = [];
                 snapshot.forEach(doc => { transactions.push({ id: doc.id, ...doc.data() }); });
                 renderLedger(transactions);
             });
 
-            // Real-time Gallery Listener
             onSnapshot(collection(db, "gallery"), (snapshot) => {
                 window.galleryImages = [];
                 snapshot.forEach(doc => { window.galleryImages.push({ id: doc.id, ...doc.data() }); });
