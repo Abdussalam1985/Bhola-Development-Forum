@@ -32,9 +32,15 @@
             <div class="flex items-center gap-3 text-center md:text-left">
                 <div class="relative group">
                     <img id="logoDisplay" src="https://via.placeholder.com/80" alt="App Logo" class="w-14 h-14 rounded-full object-cover border-2 border-amber-300 shadow bg-white">
-                    <label id="logoUploadBtn" onclick="triggerLogoUpload()" class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition cursor-pointer text-xs hidden" title="লোগো পরিবর্তন করুন">
-                        <i class="fa-solid fa-camera"></i>
-                    </label>
+                    <!-- Admin Action Overlay for Logo -->
+                    <div id="logoActionsOverlay" class="absolute inset-0 bg-black/70 rounded-full flex items-center justify-center gap-1.5 opacity-0 group-hover:opacity-100 transition hidden">
+                        <label onclick="triggerLogoUpload()" class="text-white hover:text-amber-300 cursor-pointer text-xs p-1" title="লোগো পরিবর্তন করুন">
+                            <i class="fa-solid fa-camera"></i>
+                        </label>
+                        <button onclick="removeLogo()" class="text-rose-400 hover:text-rose-300 cursor-pointer text-xs p-1" title="লোগো বাদ দিন / রিসেট করুন">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
                     <input type="file" id="logoFileInput" class="hidden" accept="image/*" onchange="handleLogoUpload(event)">
                 </div>
                 <div>
@@ -398,6 +404,17 @@
             }
         }
 
+        function removeLogo() {
+            if(!isAdmin) return;
+            if(confirm(currentLang === 'bn' ? 'আপনি কি লোগোটি সরিয়ে ডিফল্ট অবস্থায় ফিরিয়ে নিতে চান?' : 'Do you want to remove the logo and reset?')) {
+                customLogo = 'https://via.placeholder.com/192';
+                localStorage.setItem('bhola_logo', customLogo);
+                document.getElementById('logoFileInput').value = '';
+                saveData();
+                alert(currentLang === 'bn' ? 'লোগো সফলভাবে সরিয়ে দেওয়া হয়েছে!' : 'Logo removed successfully!');
+            }
+        }
+
         function toggleAdminMode() {
             if(!isAdmin) {
                 let pass = prompt(currentLang === 'bn' ? "গোপন পাসওয়ার্ডটি দিন:" : "Enter admin password:");
@@ -490,7 +507,7 @@
             const actionHeaderTh = document.getElementById('actionHeaderTh');
             const addExecBtn = document.getElementById('addExecBtn');
             const addGenBtn = document.getElementById('addGenBtn');
-            const logoUploadBtn = document.getElementById('logoUploadBtn');
+            const logoActionsOverlay = document.getElementById('logoActionsOverlay');
 
             if(isAdmin) {
                 authBtn.innerHTML = `<i class="fa-solid fa-lock-open"></i> <span>লগআউট</span>`;
@@ -501,7 +518,7 @@
                 actionHeaderTh.classList.remove('hidden');
                 addExecBtn.classList.remove('hidden');
                 addGenBtn.classList.remove('hidden');
-                logoUploadBtn.classList.remove('hidden');
+                logoActionsOverlay.classList.remove('hidden');
             } else {
                 authBtn.innerHTML = `<i class="fa-solid fa-lock"></i> <span>অ্যাডমিন লগইন</span>`;
                 authBtn.className = "bg-amber-400 text-blue-950 font-bold text-xs px-4 py-2 rounded-xl shadow";
@@ -511,7 +528,7 @@
                 actionHeaderTh.classList.add('hidden');
                 addExecBtn.classList.add('hidden');
                 addGenBtn.classList.add('hidden');
-                logoUploadBtn.classList.add('hidden');
+                logoActionsOverlay.classList.add('hidden');
             }
 
             let totalInc = 0, totalExp = 0, tableBody = document.getElementById('ledgerTableBody');
